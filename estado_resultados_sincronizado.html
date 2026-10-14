@@ -189,6 +189,8 @@ tr.linea:nth-of-type(even) td{background:#191919}
 tr.linea td:first-child{padding-left:34px;box-shadow:inset 4px 0 0 #3a3a3a}
 tr.linea td.lbl>span:first-child::before{content:"";display:inline-block;width:8px;height:8px;border-left:1px solid #555;border-bottom:1px solid #555;margin:0 8px 3px -14px}
 tr.linea:hover td{background:#202020}
+tr.linea td.src-est,tr.bloque.solo td.src-est{background:#2a2410;color:#f5d27a;font-style:italic}
+tr.linea td.src-est::before{content:"≈ ";font-size:10px}
 tr.linea td.src-formula{color:#e6cf7a;font-style:italic}
 tr.linea td.src-formula::before{content:"ƒ ";font-size:10px;opacity:.7}
 tr.linea td.src-manual{background:var(--celeste)} tr.linea td.src-sync{background:var(--sync)} tr.linea td.src-frozen{background:var(--frozen)}
@@ -307,6 +309,28 @@ td.al-falta .al-mk{color:var(--neg);font-size:12px}
 .ped-fil .lnk.on{border-color:var(--yellow);color:var(--yellow)}
 .ped-pegar{border:1px dashed var(--yellow);border-radius:10px;padding:10px 12px;margin-bottom:12px}
 .ped-prev{font-size:12.5px;margin-top:6px;display:flex;flex-direction:column;gap:2px}
+.pdfimp{width:120px;text-align:right;background:var(--paper);border:1px solid var(--yellow);border-radius:6px;padding:4px 6px;color:var(--ink)}
+.pdfimg{background:#fff;border-radius:8px;padding:6px;max-height:420px;overflow:auto}
+.pdfimg img{width:100%;max-width:820px;display:block;margin:0 auto}
+.yo{font-size:12.5px;color:var(--muted);display:inline-flex;align-items:center;gap:6px}
+.yo b{color:var(--ink)}
+.rolchip{font-size:11px;font-weight:700;padding:1px 8px;border-radius:99px;background:var(--yellow-soft);color:var(--yellow)}
+body.ro .req-edit{display:none!important}
+body.ro .dws.edit,body.ro #revOn,body.ro #revOff,body.ro .grip,body.ro #lupaMovOk,body.ro #lupaMov{display:none!important}
+body.ro tr.linea{cursor:default}
+body.nobloq [data-accion]{display:none!important}
+.inp{width:100%;padding:8px 10px;border:1px solid #3a3a3a;border-radius:7px;background:var(--surface2);color:var(--ink);font:inherit}
+.usr-t{width:100%;border-collapse:collapse;font-size:13px}
+.usr-t th,.usr-t td{padding:7px 6px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+.usr-t th{color:var(--muted);font-weight:600}
+.usr-t tr.off td{opacity:.45}
+.permchips{display:flex;flex-wrap:wrap;gap:4px}
+.pc{font-size:11px;padding:1px 7px;border-radius:99px;background:#2a2a2a}
+.pc.on{background:var(--sync);color:var(--sync-ink)}
+.usr-form{border:1px dashed var(--yellow);border-radius:10px;padding:12px;margin-top:14px;display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+.usr-form .full{grid-column:1/-1}
+.usr-form label{font-size:12.5px;color:var(--muted);display:flex;flex-direction:column;gap:4px}
+.usr-form .chips label{flex-direction:row}
 .pend-mes{border-top:1px solid var(--line);padding-top:10px;margin-top:10px}
 .pend-mes.foco{border-left:3px solid var(--yellow);padding-left:10px}
 .pend-u{font-size:14px;color:var(--yellow);margin:14px 0 0;text-transform:uppercase;letter-spacing:.05em}
@@ -333,6 +357,9 @@ td.al-falta .al-mk{color:var(--neg);font-size:12px}
     <p id="desc">Lo contable sale del export de Odoo; las líneas celestes se cargan desde su propia fuente. Los meses congelados quedan fijos.</p>
   </div></div>
   <div class="g" style="display:flex;gap:8px;flex-wrap:wrap">
+    <span class="yo" id="yoChip" hidden></span>
+    <button class="btn ghost" id="btnUsuarios" type="button" hidden>Usuarios</button>
+    <button class="btn ghost" id="btnSalir" type="button" hidden>Salir</button>
     <button class="btn ghost" id="btnPedidos" type="button">Pedidos de mejora <span class="pcount" id="pedCount" hidden></span></button>
     <button class="btn ghost" id="btnRecargar" title="Volver a leer la base">↻ Actualizar</button>
   </div>
@@ -346,13 +373,13 @@ td.al-falta .al-mk{color:var(--neg);font-size:12px}
     </div>
   </div>
   <div class="g">
-    <label class="btn ghost" id="impLbl" tabindex="0" role="button">Importar export de Odoo<input type="file" id="imp" accept=".xlsx,.xls" hidden></label>
-    <button class="btn ghost" id="btnCheques">Traer del panel de cheques</button>
-    <label class="btn ghost" id="histLbl" tabindex="0" role="button" title="Cargar meses históricos desde el Excel retrabajado">Cargar histórico<input type="file" id="histFile" accept=".xlsx,.xls" hidden></label>
-    <label class="btn ghost" id="pdfLbl" tabindex="0" role="button">Importar VEP y boletas<input type="file" id="pdfFile" accept=".pdf,application/pdf" multiple hidden></label>
-    <label class="btn ghost" id="cmvLbl" tabindex="0" role="button">Importar CMV<input type="file" id="cmvFile" accept=".xlsx,.xls" hidden></label>
-    <label class="btn ghost" id="pagLbl" tabindex="0" role="button">Importar pagos a socios<input type="file" id="pagFile" accept=".xlsx,.xls" hidden></label>
-    <label class="btn ghost" id="cfLbl" tabindex="0" role="button">Importar Cash Flow<input type="file" id="cfFile" accept=".xlsx,.xls" hidden></label>
+    <label class="btn ghost req-edit" id="impLbl" tabindex="0" role="button">Importar export de Odoo<input type="file" id="imp" accept=".xlsx,.xls" hidden></label>
+    <button class="btn ghost req-edit" id="btnCheques">Traer del panel de cheques</button>
+    <label class="btn ghost req-edit" id="histLbl" tabindex="0" role="button" title="Cargar meses históricos desde el Excel retrabajado">Cargar histórico<input type="file" id="histFile" accept=".xlsx,.xls" hidden></label>
+    <label class="btn ghost req-edit" id="pdfLbl" tabindex="0" role="button">Importar VEP y boletas<input type="file" id="pdfFile" accept=".pdf,application/pdf" multiple hidden></label>
+    <label class="btn ghost req-edit" id="cmvLbl" tabindex="0" role="button">Importar CMV<input type="file" id="cmvFile" accept=".xlsx,.xls" hidden></label>
+    <label class="btn ghost req-edit" id="pagLbl" tabindex="0" role="button">Importar pagos a socios<input type="file" id="pagFile" accept=".xlsx,.xls" hidden></label>
+    <label class="btn ghost req-edit" id="cfLbl" tabindex="0" role="button">Importar Cash Flow<input type="file" id="cfFile" accept=".xlsx,.xls" hidden></label>
     <button class="btn" id="btnExport">Exportar</button>
   </div>
 </div>
@@ -362,6 +389,7 @@ td.al-falta .al-mk{color:var(--neg);font-size:12px}
   <span><i class="sw man"></i>Carga manual</span>
   <span><i class="sw sync"></i>Sincronizado (cheques o Cash Flow)</span>
   <span><i class="sw" style="background:none;border:0;color:#e6cf7a;font-style:italic;width:auto;height:auto">ƒ</i>Fórmula</span>
+  <span><i class="sw" style="background:#2a2410;border-color:#6b5a1e"></i>≈ Estimado (Cash Flow)</span>
   <span><i class="sw pend"></i>Fuente pendiente</span>
   <span><i class="sw frozen"></i>Mes congelado</span>
 </div>
@@ -415,6 +443,17 @@ td.al-falta .al-mk{color:var(--neg);font-size:12px}
 </form></dialog>
 
 <button type="button" class="fab" id="fabPedido" title="Anotar un error, mejora o idea">✎ Pedido de mejora <span class="pcount" id="fabCount" hidden></span></button>
+<dialog id="dlgLogin" aria-labelledby="dlgLoginT" style="width:min(400px,94vw)">
+  <div class="dh"><span class="logo" aria-hidden="true" style="display:block;margin-bottom:10px"></span><h2 id="dlgLoginT">Ingresar</h2><p class="sub">Estado de Resultados · SPL / Spotsline</p></div>
+  <div class="db"><label class="ped-lbl" for="lgUser">Usuario</label><input id="lgUser" class="inp" autocomplete="username">
+    <label class="ped-lbl" for="lgPin" style="margin-top:10px">Clave</label><input id="lgPin" class="inp" type="password" autocomplete="current-password">
+    <p class="sub" id="lgErr" style="color:var(--neg);min-height:18px;margin-top:8px"></p></div>
+  <div class="df"><button type="button" class="btn" id="lgOk">Entrar</button></div>
+</dialog>
+<dialog id="dlgUsr" aria-labelledby="dlgUsrT" style="width:min(860px,96vw)">
+  <div class="dh" style="display:flex;justify-content:space-between;gap:12px"><div><h2 id="dlgUsrT">Usuarios y permisos</h2><p class="sub" id="usrSub"></p></div><button type="button" class="lnkx" id="usrCerrar">Cerrar</button></div>
+  <div class="db" id="usrBody"></div>
+</dialog>
 <dialog id="dlgPed" aria-labelledby="dlgPedT" style="width:min(720px,96vw)">
   <div class="dh" style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px"><h2 id="dlgPedT">Pedidos de mejora</h2><button type="button" class="lnkx" id="pedCerrar">Cerrar</button></div>
   <div class="db">
@@ -477,7 +516,7 @@ const MAPEO_CHEQUES = {
 const CATS_SIN_ASIGNAR = ['IVA'];
 /* ========================================================= */
 
-const EST_BASE = [{"b":"ventas","t":"Ventas netas","l":[{"id":"ventas","n":"Ventas netas de bienes y servicios","s":"odoo","c":["4.1.1.01.010"]}]},{"b":"cmv","t":"CMV","l":[{"id":"cmv","n":"CMV","s":"costo","r":["5.1.1.01.030"],"rg":"Export de Odoo \"Estadísticas de facturas\": suma de la columna Valor del inventario de todas las líneas del mes (facturas, notas de crédito y débito, y comprobantes internos 0001/…). Reemplaza a Compra de mercadería de Odoo."}]},{"sub":"cvv","t":"Costo de venta variable","f":["ventas","cmv"]},{"sub":"bruta","t":"Ganancia (pérdida) bruta","f":["ventas","cmv"]},{"b":"prod","t":"Gastos de producción","l":[{"id":"sueldos_prod","n":"Sueldos y SAC Producción","s":"sueldos","r":["5.1.2.01.010"]},{"id":"sac_prod","n":"SAC + Cargas Sociales","s":"formula","fx":{"base":"sueldos_prod","div":[2,6]},"rg":"Fórmula: Sueldos y SAC Producción ÷ 2 ÷ 6."},{"id":"gv_prod","n":"Gastos Varios Producción","s":"odoo","c":["5.1.2.01.030"]},{"id":"gas_prod","n":"Servicio de Gas Producción","s":"odoo","c":["5.1.2.01.070"],"nota":"En ago 2026 se tomó el valor que Odoo trae en sept."},{"id":"mant_prod","n":"Mantenimiento y Reparaciones Producción","s":"odoo","c":["5.1.2.01.090"]}]},{"b":"com","t":"Gastos de comercialización","l":[{"id":"sueldos_com","n":"Sueldos y SAC Comercial","s":"sueldos","r":["5.2.1.01.010"]},{"id":"sac_com","n":"SAC + Cargas Sociales","s":"formula","fx":{"base":"sueldos_com","div":[2,6]},"rg":"Fórmula: Sueldos y SAC Comercial ÷ 2 ÷ 6."},{"id":"movilidad","n":"Movilidad y viáticos","s":"odoo","c":["5.2.1.01.050"]},{"id":"publicidad","n":"Publicidad","s":"odoo","c":["5.2.1.01.060"]},{"id":"comisiones","n":"Comisiones Pagadas","s":"odoo","c":["5.2.1.01.070"]},{"id":"hon_com","n":"Honorarios Comercial","s":"odoo","c":["5.2.1.01.110"]},{"id":"seg_com","n":"Seguros Comercial","s":"seguros","r":["5.2.1.01.130"],"nota":"Socios + vendedores"},{"id":"seg_flota","n":"Seguros Comercial Real Flota","s":"seguros","nota":"Flota spots"},{"id":"flete","n":"Flete/Expresos","s":"odoo","c":["5.2.1.01.140"]},{"id":"comex","n":"Gastos comex","s":"odoo","c":["5.2.1.01.150"]},{"id":"gcom","n":"Gastos comerciales","s":"odoo","c":["5.2.1.02.031"]}]},{"b":"adm","t":"Gastos de administración","l":[{"id":"sueldos_adm","n":"Sueldos y SAC Administrativos","s":"sueldos","r":["5.3.1.01.010"]},{"id":"sac_adm","n":"SAC + Cargas Sociales","s":"formula","fx":{"base":"sueldos_adm","div":[2,6]},"rg":"Fórmula: Sueldos y SAC Administrativos ÷ 2 ÷ 6."},{"id":"gv_adm","n":"Gastos varios Administrativos","s":"odoo","c":["5.3.1.01.030"]},{"id":"alquileres","n":"Alquileres Administrativos","s":"odoo","c":["5.3.1.01.040"],"nota":"No vino en el export de Odoo de ago-oct 2026; en el Excel figura -800.000 fijo."},{"id":"luz","n":"Servicio Eléctrico Administrativos (Luz)","s":"odoo","c":["5.3.1.01.050","5.1.2.01.050"],"nota":"Suma también Servicio Eléctrico Producción (5.1.2.01.050), que se reclasifica acá."},{"id":"internet","n":"Servicio de Internet","s":"odoo","c":["5.3.1.01.080"]},{"id":"sistema","n":"Sistema y Software","s":"odoo","c":["5.3.1.01.090"]},{"id":"hon_adm","n":"Honorarios Administración","s":"odoo","c":["5.3.1.01.110"]},{"id":"libreria","n":"Artículos de librería","s":"odoo","c":["5.3.1.01.120"]},{"id":"seg_adm","n":"Seguros Administración","s":"odoo","c":["5.3.1.01.130"]},{"id":"sellados","n":"Sellados y Certificaciones","s":"odoo","c":["5.3.1.01.140"]}]},{"b":"otros","t":"Otros gastos","l":[{"id":"gv_otros","n":"Gastos Varios","s":"odoo","c":["5.01.01.022"]},{"id":"descuentos","n":"Descuentos Otorgados","s":"odoo","c":["5.01.01.024"]},{"id":"hon_prod","n":"Honorarios Producción","s":"odoo","c":["5.1.2.01.110","5.1.2.01.100"],"nota":"Incluye Higiene y Seguridad (5.1.2.01.100, Ecopure)."},{"id":"mant_limp","n":"Mantenimiento y limpieza","s":"odoo","c":["5.1.2.01.120"]},{"id":"seg_prod","n":"Seguros Producción","s":"odoo","c":["5.1.2.01.130"]},{"id":"obras_soc","n":"Obras Sociales","s":"odoo","c":["5.1.2.01.140"],"nota":"Sale de Odoo; se le pueden sumar ajustes manuales desde la lupa."},{"id":"iibb","n":"IIBB (Percepciones provinciales)","s":"bancos","r":["5.4.2.01.190"]},{"id":"imp_cheque","n":"Impuesto a los débitos y créditos bancarios","s":"bancos","r":["5.4.3.01.010"]},{"id":"com_banc","n":"Comisiones Bancarias + Imp. Sellos","s":"bancos","r":["5.6.1.01.060"],"nota":"Odoo trae todo junto como Gastos Bancarios."},{"id":"cargas","n":"Cargas Sociales","s":"sueldos","rg":"VEP 931 (Empleadores SICOSS) o formulario 931 en PDF: importe total a pagar del período (todos los códigos: 301, 351, 302, 352, 312, 028…). El período del VEP es el mes del estado de resultados."},{"id":"asimra","n":"Asimra","s":"sueldos","u":["spotsline"],"rg":"Boleta de ASIMRA (PDF), por período. Solo Spotsline."},{"id":"uom","n":"UOM","s":"sueldos","u":["spotsline"],"rg":"Boleta de UOM (PDF), por período. Solo Spotsline."},{"id":"sec","n":"SEC (Sindicato Empleados de Comercio)","s":"sueldos","u":["spl"],"rg":"Boleta SEC Zona Norte (PDF): monto total a depositar al primer vencimiento, por período. Solo SPL."},{"id":"osecac","n":"OSECAC","s":"sueldos","u":["spl"],"rg":"Boleta OSECAC (PDF): total a transferir, por período. Solo SPL."},{"id":"faecys","n":"FAECYS","s":"sueldos","u":["spl"],"rg":"Boleta FAECYS (PDF): monto total a depositar al primer vencimiento, por período. Solo SPL."},{"id":"inacap","n":"INACAP","s":"sueldos","u":["spl"],"rg":"Boleta INACAP (PDF): monto total, por período. Solo SPL."},{"id":"ajuste_saldo","n":"Ajuste de saldo inicial","s":"odoo","c":["9.9.9.99.99"],"nota":"Cuenta de ajuste de apertura de Odoo. Revisar: en SPL julio 2026 trae +109,5M."}]},{"sub":"ebitda","t":"EBITDA","f":["bruta","prod","com","adm","otros"]},{"b":"fin","t":"Resultados financieros y por tenencia","l":[{"id":"descubierto","n":"Intereses por descubierto","s":"bancos","r":["5.6.1.01.030"]},{"id":"venta_valores","n":"Intereses por venta de valores","s":"bancos","r":["5.6.1.01.040"]},{"id":"prestamos","n":"Intereses préstamos bancarios","s":"cashflow","rg":"Solapa Créditos Bancarios: Int. Financiero + Int. Resarcitorio, por Fecha Vto. Excluye filas con Estado Caduco.","r":["5.6.1.01.020"]},{"id":"afip_planes","n":"Intereses AFIP Planes","s":"cashflow","rg":"Solapa Planes ARCA: Interés Financiero, por Fecha Vencimiento. Excluye filas con Estado Caduco.","r":["5.6.1.01.050"]},{"id":"afip_sct","n":"Intereses AFIP Sist. Ctas. Tributarias","s":"cashflow","rg":"Solapa Deudas ARCA: IntResarcitorio + IntPunitorio, por Vencimiento. Excluye filas con Estado Caduco."},{"id":"arba","n":"Intereses moratoria ARBA","s":"cashflow","rg":"Solapa Planes de Pago, Tipo RENTAS: Int. Financiero + Int. Resarcitorio, por Fecha Vto. Excluye filas con Estado Caduco."},{"id":"uom_mor","n":"Intereses moratoria UOM","s":"cashflow","rg":"Solapa Planes de Pago, Tipo UOM: Int. Financiero + Int. Resarcitorio, por Fecha Vto. Excluye filas con Estado Caduco."},{"id":"asimra_mor","n":"Intereses moratoria ASIMRA / OSSIMRA","s":"cashflow","rg":"Solapa Planes de Pago, Tipo ASIMRA u OSSIMRA: Int. Financiero + Int. Resarcitorio, por Fecha Vto. Excluye filas con Estado Caduco."},{"id":"andina_mor","n":"Intereses moratoria ANDINA","s":"cashflow","rg":"Solapa Planes de Pago, Tipo ANDINA: Int. Financiero + Int. Resarcitorio, por Fecha Vto. Excluye filas con Estado Caduco."},{"id":"sh_mor","n":"Intereses Seguridad e Higiene","s":"cashflow","cero":true,"rg":"Sin fuente por ahora: arranca en 0 y se puede editar a mano."},{"id":"dif_cambio","n":"Diferencias de cambio","s":"odoo","c":["4.2.1.01.020"],"nota":"Línea nueva: aparece en Odoo desde sept 2026."}]},{"b":"indem","t":"Indemnizaciones","l":[{"id":"despidos","n":"Despidos","s":"cashflow","r":["5.7.1.01.010"],"rg":"Cash Flow, solapa Desvinculaciones: columna Cuota, por Fecha Vto."},{"id":"acuerdos","n":"Acuerdos","s":"cashflow","r":["5.7.1.01.020"],"rg":"Cash Flow, solapa Planes de Pago, Tipo SUELDOS: columna Cuota, por Fecha Vto."}]},{"b":"otring","t":"Otros ingresos y egresos","l":[{"id":"redondeo","n":"Ajuste por redondeo","s":"odoo","c":["4.2.1.01.030"],"nota":"Ojo: en ago 2026 Odoo trajo +54,3M y se restaron 53.977.500 a mano."},{"id":"incobrables","n":"Pérdida deudores incobrables","s":"odoo","c":["999000000003"]}]},{"sub":"antes","t":"Resultado antes del impuesto a las ganancias","f":["ebitda","fin","indem","otring"]},{"b":"imp","t":"Impuesto a las ganancias","l":[{"id":"imp_gan","n":"Impuesto a las ganancias","s":"odoo","c":[]}]},{"b":"ret","t":"Retiro de socios","l":[{"id":"ret_eduardo","n":"Eduardo Porcel","s":"socios","rg":"Pagos a socios de Odoo (por fecha de la orden de pago) + tarjetas de la solapa TDC del Cash Flow con Empresa SOCIOS (por Fecha Vto.). En Odoo figura como \".\"; en TDC, EDUARDO o LALO."},{"id":"ret_facundo","n":"Facundo Porcel","s":"socios","rg":"Pagos a socios de Odoo (por fecha de la orden de pago) + tarjetas de la solapa TDC del Cash Flow con Empresa SOCIOS (por Fecha Vto.). En Odoo figura como \"..\"; en TDC, FACU o FACUNDO."},{"id":"ret_juanma","n":"Juan Manuel Porcel","s":"socios","rg":"Pagos a socios de Odoo (por fecha de la orden de pago) + tarjetas de la solapa TDC del Cash Flow con Empresa SOCIOS (por Fecha Vto.). En Odoo figura como Juan Manuel Porcel; en TDC, JM o J."},{"id":"tc_corp","n":"TC corporativas","s":"cashflow","rg":"Cash Flow, solapa TDC, Empresa SPOTSLINE o SPL: columna Importe, por Fecha Vto. Los consumos en dólares se convierten al tipo de cambio cargado al importar."}]},{"sub":"final","t":"Resultado final del ejercicio","f":["antes","imp","ret"]}];
+const EST_BASE = [{"b":"ventas","t":"Ventas netas","l":[{"id":"ventas","n":"Ventas netas de bienes y servicios","s":"odoo","c":["4.1.1.01.010"]}]},{"b":"cmv","t":"CMV","l":[{"id":"cmv","n":"CMV","s":"costo","r":["5.1.1.01.030"],"rg":"Export de Odoo \"Estadísticas de facturas\": suma de la columna Valor del inventario de todas las líneas del mes (facturas, notas de crédito y débito, y comprobantes internos 0001/…). Reemplaza a Compra de mercadería de Odoo."}]},{"sub":"cvv","t":"Costo de venta variable","f":["ventas","cmv"]},{"sub":"bruta","t":"Ganancia (pérdida) bruta","f":["ventas","cmv"]},{"b":"prod","t":"Gastos de producción","l":[{"id":"sueldos_prod","n":"Sueldos y SAC Producción","s":"sueldos","r":["5.1.2.01.010"]},{"id":"sac_prod","n":"SAC + Cargas Sociales","s":"formula","fx":{"base":"sueldos_prod","div":[2,6]},"rg":"Fórmula: Sueldos y SAC Producción ÷ 2 ÷ 6."},{"id":"gv_prod","n":"Gastos Varios Producción","s":"odoo","c":["5.1.2.01.030"]},{"id":"gas_prod","n":"Servicio de Gas Producción","s":"odoo","c":["5.1.2.01.070"],"nota":"En ago 2026 se tomó el valor que Odoo trae en sept."},{"id":"mant_prod","n":"Mantenimiento y Reparaciones Producción","s":"odoo","c":["5.1.2.01.090"]}]},{"b":"com","t":"Gastos de comercialización","l":[{"id":"sueldos_com","n":"Sueldos y SAC Comercial","s":"sueldos","r":["5.2.1.01.010"]},{"id":"sac_com","n":"SAC + Cargas Sociales","s":"formula","fx":{"base":"sueldos_com","div":[2,6]},"rg":"Fórmula: Sueldos y SAC Comercial ÷ 2 ÷ 6."},{"id":"movilidad","n":"Movilidad y viáticos","s":"odoo","c":["5.2.1.01.050"]},{"id":"publicidad","n":"Publicidad","s":"odoo","c":["5.2.1.01.060"]},{"id":"comisiones","n":"Comisiones Pagadas","s":"odoo","c":["5.2.1.01.070"]},{"id":"hon_com","n":"Honorarios Comercial","s":"odoo","c":["5.2.1.01.110"]},{"id":"seg_com","n":"Seguros Comercial","s":"seguros","r":["5.2.1.01.130"],"nota":"Socios + vendedores"},{"id":"seg_flota","n":"Seguros Comercial Real Flota","s":"seguros","nota":"Flota spots"},{"id":"flete","n":"Flete/Expresos","s":"odoo","c":["5.2.1.01.140"]},{"id":"comex","n":"Gastos comex","s":"odoo","c":["5.2.1.01.150"]},{"id":"gcom","n":"Gastos comerciales","s":"odoo","c":["5.2.1.02.031"]}]},{"b":"adm","t":"Gastos de administración","l":[{"id":"sueldos_adm","n":"Sueldos y SAC Administrativos","s":"sueldos","r":["5.3.1.01.010"]},{"id":"sac_adm","n":"SAC + Cargas Sociales","s":"formula","fx":{"base":"sueldos_adm","div":[2,6]},"rg":"Fórmula: Sueldos y SAC Administrativos ÷ 2 ÷ 6."},{"id":"gv_adm","n":"Gastos varios Administrativos","s":"odoo","c":["5.3.1.01.030"]},{"id":"alquileres","n":"Alquileres Administrativos","s":"odoo","c":["5.3.1.01.040"],"nota":"No vino en el export de Odoo de ago-oct 2026; en el Excel figura -800.000 fijo."},{"id":"luz","n":"Servicio Eléctrico Administrativos (Luz)","s":"odoo","c":["5.3.1.01.050","5.1.2.01.050"],"nota":"Suma también Servicio Eléctrico Producción (5.1.2.01.050), que se reclasifica acá."},{"id":"internet","n":"Servicio de Internet","s":"odoo","c":["5.3.1.01.080"]},{"id":"sistema","n":"Sistema y Software","s":"odoo","c":["5.3.1.01.090"]},{"id":"hon_adm","n":"Honorarios Administración","s":"odoo","c":["5.3.1.01.110"]},{"id":"libreria","n":"Artículos de librería","s":"odoo","c":["5.3.1.01.120"]},{"id":"seg_adm","n":"Seguros Administración","s":"odoo","c":["5.3.1.01.130"]},{"id":"sellados","n":"Sellados y Certificaciones","s":"odoo","c":["5.3.1.01.140"]}]},{"b":"otros","t":"Otros gastos","l":[{"id":"gv_otros","n":"Gastos Varios","s":"odoo","c":["5.01.01.022"]},{"id":"descuentos","n":"Descuentos Otorgados","s":"odoo","c":["5.01.01.024"]},{"id":"hon_prod","n":"Honorarios Producción","s":"odoo","c":["5.1.2.01.110","5.1.2.01.100"],"nota":"Incluye Higiene y Seguridad (5.1.2.01.100, Ecopure)."},{"id":"mant_limp","n":"Mantenimiento y limpieza","s":"odoo","c":["5.1.2.01.120"]},{"id":"seg_prod","n":"Seguros Producción","s":"odoo","c":["5.1.2.01.130"]},{"id":"obras_soc","n":"Obras Sociales","s":"odoo","c":["5.1.2.01.140"],"nota":"Sale de Odoo; se le pueden sumar ajustes manuales desde la lupa."},{"id":"iibb","n":"IIBB (Percepciones provinciales)","s":"bancos","r":["5.4.2.01.190"]},{"id":"imp_cheque","n":"Impuesto a los débitos y créditos bancarios","s":"bancos","r":["5.4.3.01.010"]},{"id":"com_banc","n":"Comisiones Bancarias + Imp. Sellos","s":"bancos","r":["5.6.1.01.060"],"nota":"Odoo trae todo junto como Gastos Bancarios."},{"id":"cargas","n":"Cargas Sociales","s":"sueldos","rg":"VEP 931 (Empleadores SICOSS) o formulario 931 en PDF: importe total a pagar del período (todos los códigos: 301, 351, 302, 352, 312, 028…). El período del VEP es el mes del estado de resultados."},{"id":"asimra","n":"Asimra","s":"sueldos","u":["spotsline"],"rg":"Boleta ASIMRA aporte Ley 23.551 (PDF): total a pagar, por período. Solo Spotsline."},{"id":"asimra_vida","n":"Asimra Seguro de vida (Art. 18)","s":"sueldos","u":["spotsline"],"rg":"Boleta ASIMRA Art. 18 seguro de vida (PDF): total a pagar (contribución empleador + aporte personal), por período. Solo Spotsline."},{"id":"uom","n":"UOM","s":"sueldos","u":["spotsline"],"rg":"Boleta UOM cuota sindical (PDF): total depositado, por período. Solo Spotsline."},{"id":"uom_vida","n":"UOM Seguro de vida y sepelio (Art. 52)","s":"sueldos","u":["spotsline"],"rg":"Boleta UOM Art. 52 CCT 260/75 seguro de vida colectivo / sepelio (PDF): total depositado, por período. Solo Spotsline."},{"id":"sec","n":"SEC (Sindicato Empleados de Comercio)","s":"sueldos","u":["spl"],"rg":"Boleta SEC Zona Norte (PDF): monto total a depositar al primer vencimiento, por período. Solo SPL."},{"id":"osecac","n":"OSECAC","s":"sueldos","u":["spl"],"rg":"Boleta OSECAC (PDF): total a transferir, por período. Solo SPL."},{"id":"faecys","n":"FAECYS","s":"sueldos","u":["spl"],"rg":"Boleta FAECYS (PDF): monto total a depositar al primer vencimiento, por período. Solo SPL."},{"id":"inacap","n":"INACAP","s":"sueldos","u":["spl"],"rg":"Boleta INACAP (PDF): monto total, por período. Solo SPL."},{"id":"ajuste_saldo","n":"Ajuste de saldo inicial","s":"odoo","c":["9.9.9.99.99"],"nota":"Cuenta de ajuste de apertura de Odoo. Revisar: en SPL julio 2026 trae +109,5M."}]},{"sub":"ebitda","t":"EBITDA","f":["bruta","prod","com","adm","otros"]},{"b":"fin","t":"Resultados financieros y por tenencia","l":[{"id":"descubierto","n":"Intereses por descubierto","s":"bancos","r":["5.6.1.01.030"]},{"id":"venta_valores","n":"Intereses por venta de valores","s":"bancos","r":["5.6.1.01.040"]},{"id":"prestamos","n":"Intereses préstamos bancarios","s":"cashflow","rg":"Solapa Créditos Bancarios: Int. Financiero + Int. Resarcitorio, por Fecha Vto. Excluye filas con Estado Caduco.","r":["5.6.1.01.020"]},{"id":"afip_planes","n":"Intereses AFIP Planes","s":"cashflow","rg":"Solapa Planes ARCA: Interés Financiero, por Fecha Vencimiento. Excluye filas con Estado Caduco.","r":["5.6.1.01.050"]},{"id":"afip_sct","n":"Intereses AFIP Sist. Ctas. Tributarias","s":"cashflow","rg":"Solapa Deudas ARCA: IntResarcitorio + IntPunitorio, por Vencimiento. Excluye filas con Estado Caduco."},{"id":"arba","n":"Intereses moratoria ARBA","s":"cashflow","rg":"Solapa Planes de Pago, Tipo RENTAS: Int. Financiero + Int. Resarcitorio, por Fecha Vto. Excluye filas con Estado Caduco."},{"id":"uom_mor","n":"Intereses moratoria UOM","s":"cashflow","rg":"Solapa Planes de Pago, Tipo UOM: Int. Financiero + Int. Resarcitorio, por Fecha Vto. Excluye filas con Estado Caduco."},{"id":"asimra_mor","n":"Intereses moratoria ASIMRA / OSSIMRA","s":"cashflow","rg":"Solapa Planes de Pago, Tipo ASIMRA u OSSIMRA: Int. Financiero + Int. Resarcitorio, por Fecha Vto. Excluye filas con Estado Caduco."},{"id":"andina_mor","n":"Intereses moratoria ANDINA","s":"cashflow","rg":"Solapa Planes de Pago, Tipo ANDINA: Int. Financiero + Int. Resarcitorio, por Fecha Vto. Excluye filas con Estado Caduco."},{"id":"sh_mor","n":"Intereses Seguridad e Higiene","s":"cashflow","cero":true,"rg":"Sin fuente por ahora: arranca en 0 y se puede editar a mano."},{"id":"dif_cambio","n":"Diferencias de cambio","s":"odoo","c":["4.2.1.01.020"],"nota":"Línea nueva: aparece en Odoo desde sept 2026."}]},{"b":"indem","t":"Indemnizaciones","l":[{"id":"despidos","n":"Despidos","s":"cashflow","r":["5.7.1.01.010"],"rg":"Cash Flow, solapa Desvinculaciones: columna Cuota, por Fecha Vto."},{"id":"acuerdos","n":"Acuerdos","s":"cashflow","r":["5.7.1.01.020"],"rg":"Cash Flow, solapa Planes de Pago, Tipo SUELDOS: columna Cuota, por Fecha Vto."}]},{"b":"otring","t":"Otros ingresos y egresos","l":[{"id":"redondeo","n":"Ajuste por redondeo","s":"odoo","c":["4.2.1.01.030"],"nota":"Ojo: en ago 2026 Odoo trajo +54,3M y se restaron 53.977.500 a mano."},{"id":"incobrables","n":"Pérdida deudores incobrables","s":"odoo","c":["999000000003"]}]},{"sub":"antes","t":"Resultado antes del impuesto a las ganancias","f":["ebitda","fin","indem","otring"]},{"b":"imp","t":"Impuesto a las ganancias","l":[{"id":"imp_gan","n":"Impuesto a las ganancias","s":"odoo","c":[]}]},{"b":"ret","t":"Retiro de socios","l":[{"id":"ret_eduardo","n":"Eduardo Porcel","s":"socios","rg":"Pagos a socios de Odoo (por fecha de la orden de pago) + tarjetas de la solapa TDC del Cash Flow con Empresa SOCIOS (por Fecha Vto.). En Odoo figura como \".\"; en TDC, EDUARDO o LALO."},{"id":"ret_facundo","n":"Facundo Porcel","s":"socios","rg":"Pagos a socios de Odoo (por fecha de la orden de pago) + tarjetas de la solapa TDC del Cash Flow con Empresa SOCIOS (por Fecha Vto.). En Odoo figura como \"..\"; en TDC, FACU o FACUNDO."},{"id":"ret_juanma","n":"Juan Manuel Porcel","s":"socios","rg":"Pagos a socios de Odoo (por fecha de la orden de pago) + tarjetas de la solapa TDC del Cash Flow con Empresa SOCIOS (por Fecha Vto.). En Odoo figura como Juan Manuel Porcel; en TDC, JM o J."},{"id":"tc_corp","n":"TC corporativas","s":"cashflow","rg":"Cash Flow, solapa TDC, Empresa SPOTSLINE o SPL: columna Importe, por Fecha Vto. Los consumos en dólares se convierten al tipo de cambio cargado al importar."}]},{"sub":"final","t":"Resultado final del ejercicio","f":["antes","imp","ret"]}];
 let EST = JSON.parse(JSON.stringify(EST_BASE));
 let CONFIG = {ubicacion:{}};
 const SEED = {"spotsline:2026-08":{"unidad":"spotsline","mes":"2026-08","estado":"congelado","valores":{"ventas":239968767.7,"cmv":-82195581.58,"sueldos_prod":-57222711.0,"sac_prod":-4768559.25,"gv_prod":-1299060.39,"gas_prod":-1549221.76,"mant_prod":-4814997.3,"sueldos_com":-5797813.16,"sac_com":-483151.1,"movilidad":-1361947.21,"publicidad":-638800.0,"comisiones":-16839559.43,"hon_com":-2000000.0,"seg_com":-1054041.35,"seg_flota":-1039887.64,"flete":-7075432.28,"comex":0.0,"gcom":-1823881.71,"sueldos_adm":-9583763.0,"sac_adm":-798646.92,"gv_adm":-737290.85,"alquileres":-800000.0,"luz":-4861090.71,"sistema":-1516238.2,"hon_adm":-28962921.0,"libreria":0.0,"seg_adm":-545878.3,"sellados":-141261.41,"gv_otros":-2239420.74,"descuentos":-4613833.55,"hon_prod":-351000.0,"mant_limp":-360722.07,"seg_prod":0.0,"obras_soc":-2768680.93,"iibb":-263893.43,"imp_cheque":1140472.1,"com_banc":-1120664.13,"cargas":-17652565.54,"asimra":-380305.12,"uom":-1742779.84,"descubierto":-2454149.27,"venta_valores":-9427455.51,"prestamos":-19886835.0,"afip_planes":-10729310.86,"afip_sct":-54374.77,"arba":-1041086.0,"uom_mor":0.0,"sh_mor":0.0,"despidos":-28695250.0,"acuerdos":-2500000.0,"redondeo":329042.54,"imp_gan":0.0,"ret_eduardo":-2708762.29,"ret_facundo":-2598919.97,"ret_juanma":-1500000.0,"dif_cambio":0},"manual":{},"congeladoPor":"Excel histórico","congeladoEn":"2026-10-01T18:00:00Z","odoo":{"4.1.1.01.010":{"n":"Venta de mercadería","v":239762853.74},"5.1.1.01.030":{"n":"Compra de mercadería","v":-65775502.08},"5.1.2.01.030":{"n":"Gastos Varios Producción","v":-1299060.39},"5.1.2.01.050":{"n":"Servicio Eléctrico Producción","v":-4861090.71},"5.1.2.01.070":{"n":"Servicio de Gas Producción","v":0.0},"5.1.2.01.090":{"n":"Mantenimiento y Reparaciones Producción","v":-4814997.3},"5.2.1.01.050":{"n":"Movilidad y viáticos","v":-1361947.21},"5.2.1.01.060":{"n":"Publicidad","v":-638800.0},"5.2.1.01.070":{"n":"Comisiones Pagadas","v":-16839559.43},"5.2.1.01.110":{"n":"Honorarios Comercial","v":-2000000.0},"5.2.1.01.140":{"n":"Flete/Expresos","v":-7075432.28},"5.2.1.02.031":{"n":"Gastos comerciales","v":-1823881.71},"5.3.1.01.030":{"n":"Gastos varios Administrativos","v":-737290.85},"5.3.1.01.090":{"n":"Sistema y Software","v":-1516238.2},"5.3.1.01.110":{"n":"Honorarios Administración","v":-28962921.0},"5.3.1.01.120":{"n":"Artículos de librería","v":0.0},"5.3.1.01.130":{"n":"Seguros Administración","v":-545878.3},"5.3.1.01.140":{"n":"Sellados y Certificaciones","v":-141261.41},"5.01.01.022":{"n":"GASTOS VARIOS","v":-2239420.74},"5.01.01.024":{"n":"DESCUENTO OTORGADO","v":-4613833.55},"5.1.2.01.100":{"n":"Higiene y Seguridad","v":-351000.0},"5.1.2.01.120":{"n":"Mantenimiento y limpieza","v":-360722.07},"5.1.2.01.140":{"n":"Obras Sociales","v":-1503680.93},"5.6.1.01.060":{"n":"Gastos Bancarios","v":-13591061.14},"4.2.1.01.020":{"n":"Diferencias de cambio","v":0.0},"5.6.1.01.020":{"n":"Intereses por préstamos","v":-655403.27},"5.6.1.01.050":{"n":"Intereses fiscales","v":-9478210.39},"4.2.1.01.030":{"n":"Ajuste por redondeo","v":54317515.66}},"odooImportado":"2026-10-01T18:00:00Z"},"spotsline:2026-07":{"unidad":"spotsline","mes":"2026-07","estado":"congelado","valores":{"ventas":272535153.85,"cmv":-93217940.35,"sueldos_prod":-54140565.0,"sac_prod":-4511713.75,"gv_prod":-513427.24,"gas_prod":-1442709.76,"mant_prod":-1301255.76,"sueldos_com":-7215879.0,"sac_com":-601323.25,"movilidad":-1261975.66,"publicidad":0.0,"comisiones":-13124503.05,"hon_com":-2000000.0,"seg_com":-1054041.35,"seg_flota":-1039887.64,"flete":-6176230.21,"comex":0.0,"gcom":-3150386.32,"sueldos_adm":-9165307.0,"sac_adm":-763775.58,"gv_adm":-197151.19,"alquileres":-800000.0,"luz":-4860703.51,"sistema":-1928566.0,"hon_adm":-7312779.91,"libreria":-275909.63,"seg_adm":-221320.0,"sellados":-308467.21,"gv_otros":-12041347.81,"descuentos":-4725093.22,"hon_prod":0.0,"mant_limp":-849801.46,"seg_prod":0.0,"obras_soc":-2571610.95,"iibb":-793.99,"imp_cheque":-1041742.86,"com_banc":-833970.33,"cargas":-18469629.08,"asimra":-352850.92,"uom":-1722633.14,"descubierto":-833176.34,"venta_valores":-5718923.31,"prestamos":-15600455.0,"afip_planes":-10270730.85,"afip_sct":-90135.16,"arba":-1041086.0,"uom_mor":0.0,"sh_mor":0.0,"despidos":-26145250.0,"acuerdos":-2500000.0,"redondeo":32112.82,"imp_gan":0.0,"ret_eduardo":-4213875.57,"ret_facundo":-4861831.76,"ret_juanma":-1500000.0,"dif_cambio":0},"manual":{},"congeladoPor":"Excel histórico","congeladoEn":"2026-10-01T18:00:00Z"},"spotsline:2026-06":{"unidad":"spotsline","mes":"2026-06","estado":"congelado","valores":{"ventas":252990306.07,"cmv":-79269634.84,"sueldos_prod":-58241522.0,"sac_prod":-6676004.0,"gv_prod":-173389.17,"gas_prod":-1775903.34,"mant_prod":-1239620.69,"sueldos_com":-8338828.46,"sac_com":-442996.0,"movilidad":-959003.99,"publicidad":0.0,"comisiones":-12755613.78,"hon_com":-2000000.0,"seg_com":-1184983.0,"seg_flota":-1039887.64,"flete":-6078931.0,"comex":0.0,"gcom":-2173296.92,"sueldos_adm":-5837509.0,"sac_adm":-549065.0,"gv_adm":-665064.0,"alquileres":-800000.0,"luz":-6460559.76,"sistema":-644502.0,"hon_adm":-10344470.0,"libreria":-12697.08,"seg_adm":-174070.0,"sellados":-87053.68,"gv_otros":-1066155.3,"descuentos":-4066146.68,"hon_prod":-1061955.69,"mant_limp":-567546.75,"seg_prod":0.0,"obras_soc":-3478556.0,"iibb":0.0,"imp_cheque":-3814532.0,"com_banc":-4043656.0,"cargas":-32760291.63,"asimra":-599900.15,"uom":-2446598.08,"descubierto":0.0,"venta_valores":-9177283.0,"prestamos":-15569748.0,"afip_planes":-8739619.0,"afip_sct":-36809262.93,"arba":-1041086.0,"uom_mor":0.0,"sh_mor":0.0,"despidos":-20619301.7,"acuerdos":-5187500.0,"redondeo":560149.21,"imp_gan":0.0,"ret_eduardo":-3969781.88,"ret_facundo":-4350761.61,"ret_juanma":-3878114.0,"dif_cambio":0},"manual":{},"congeladoPor":"Excel histórico","congeladoEn":"2026-10-01T18:00:00Z"},"spotsline:2026-05":{"unidad":"spotsline","mes":"2026-05","estado":"congelado","valores":{"ventas":249601297.65,"cmv":-77041485.99,"sueldos_prod":-72151794.0,"sac_prod":-6676004.0,"gv_prod":-1173149.59,"gas_prod":-1353359.87,"mant_prod":-134876.14,"sueldos_com":-4889748.0,"sac_com":-442996.0,"movilidad":-846644.18,"publicidad":-826000.0,"comisiones":-15830959.91,"hon_com":-2500000.0,"seg_com":-1333552.0,"seg_flota":-1062685.0,"flete":-6094081.38,"comex":0.0,"gcom":-2794089.2,"sueldos_adm":-10488053.72,"sac_adm":-549065.0,"gv_adm":-171800.0,"alquileres":-800000.0,"luz":-4794188.93,"sistema":-1278299.47,"hon_adm":-9916364.62,"libreria":-207429.6,"seg_adm":0.0,"sellados":-45570.0,"gv_otros":-3696713.33,"descuentos":-4228390.06,"hon_prod":-1185048.96,"mant_limp":-21194.21,"seg_prod":-5647.1,"obras_soc":-3371669.0,"iibb":0.0,"imp_cheque":-3814532.0,"com_banc":-4043656.0,"cargas":-41681396.77,"asimra":-537440.64,"uom":-2273596.23,"descubierto":0.0,"venta_valores":-9177283.0,"prestamos":-9868648.0,"afip_planes":-8739619.0,"afip_sct":0.0,"arba":-1041086.0,"uom_mor":0.0,"sh_mor":0.0,"despidos":0.0,"acuerdos":-5187500.0,"redondeo":10855.95,"imp_gan":0.0,"ret_eduardo":-7562924.85,"ret_facundo":-3874062.03,"ret_juanma":-11634489.59,"dif_cambio":0},"manual":{},"congeladoPor":"Excel histórico","congeladoEn":"2026-10-01T18:00:00Z"},"spotsline:2026-04":{"unidad":"spotsline","mes":"2026-04","estado":"congelado","valores":{"ventas":269813705.2,"cmv":-72944162.51,"sueldos_prod":-84956305.0,"sac_prod":-6676004.0,"gv_prod":-2019775.38,"gas_prod":-1584697.42,"mant_prod":-13223.14,"sueldos_com":-4101848.0,"sac_com":-442996.0,"movilidad":-794863.39,"publicidad":-33338.28,"comisiones":-11084960.67,"hon_com":-3490000.0,"seg_com":-1333552.0,"seg_flota":-1062685.0,"flete":-6414000.0,"comex":-239650.0,"gcom":-2321301.73,"sueldos_adm":-11539307.0,"sac_adm":-549065.0,"gv_adm":-4035662.11,"alquileres":-800000.0,"luz":-5397993.65,"sistema":-254800.01,"hon_adm":-8272753.0,"libreria":-152000.0,"seg_adm":0.0,"sellados":-117659.16,"gv_otros":-3743387.9,"descuentos":-5235525.97,"hon_prod":-1213966.81,"mant_limp":-28925.65,"seg_prod":0.0,"obras_soc":-3874964.76,"iibb":0.0,"imp_cheque":-3814532.0,"com_banc":-11267191.91,"cargas":-43998509.28,"asimra":-550699.88,"uom":-2309671.78,"descubierto":0.0,"venta_valores":-9177283.0,"prestamos":-18967913.72,"afip_planes":-7825795.61,"afip_sct":0.0,"arba":-1041086.0,"uom_mor":0.0,"sh_mor":0.0,"despidos":0.0,"acuerdos":-5187500.0,"redondeo":-1701699.55,"imp_gan":0.0,"ret_eduardo":-5699291.16,"ret_facundo":-3367274.06,"ret_juanma":-3876794.18,"dif_cambio":0},"manual":{},"congeladoPor":"Excel histórico","congeladoEn":"2026-10-01T18:00:00Z"},"spotsline:2026-03":{"unidad":"spotsline","mes":"2026-03","estado":"congelado","valores":{"ventas":293492908.72,"cmv":-73696298.22,"sueldos_prod":-75074478.27,"sac_prod":-6676004.0,"gv_prod":-2165052.42,"gas_prod":-1514048.55,"mant_prod":-260000.0,"sueldos_com":-5523598.0,"sac_com":-442996.0,"movilidad":-1299871.33,"publicidad":-1367986.25,"comisiones":-8870448.06,"hon_com":-3490000.0,"seg_com":-1333552.0,"seg_flota":-1062685.0,"flete":-3755000.0,"comex":-3013395.06,"gcom":-990000.0,"sueldos_adm":-8599629.69,"sac_adm":-549065.0,"gv_adm":-1909243.25,"alquileres":-800000.0,"luz":-5878813.44,"sistema":-180000.0,"hon_adm":-9633704.21,"libreria":-209483.35,"seg_adm":0.0,"sellados":-30149.74,"gv_otros":-3670724.27,"descuentos":-4206737.18,"hon_prod":-601242.0,"mant_limp":-120000.0,"seg_prod":-4665.28,"obras_soc":-3292493.12,"iibb":0.0,"imp_cheque":-2619714.11,"com_banc":-2503749.8,"cargas":-41681396.77,"asimra":-537440.64,"uom":-2273596.68,"descubierto":0.0,"venta_valores":-10162472.28,"prestamos":-20009780.87,"afip_planes":-15018434.25,"afip_sct":0.0,"arba":-1041086.0,"uom_mor":0.0,"sh_mor":0.0,"despidos":0.0,"acuerdos":-2687500.0,"redondeo":-1701699.55,"imp_gan":0.0,"ret_eduardo":-2908000.0,"ret_facundo":-7914150.0,"ret_juanma":-2019708.0,"dif_cambio":0},"manual":{},"congeladoPor":"Excel histórico","congeladoEn":"2026-10-01T18:00:00Z"},"spotsline:2026-02":{"unidad":"spotsline","mes":"2026-02","estado":"congelado","valores":{"ventas":239286033.79,"cmv":-58578833.53,"sueldos_prod":-66778324.0,"sac_prod":-6676004.0,"gv_prod":-2462521.64,"gas_prod":-1665265.83,"mant_prod":-790970.0,"sueldos_com":-6704128.0,"sac_com":-442996.0,"movilidad":-892415.04,"publicidad":-942254.73,"comisiones":-11252824.24,"hon_com":-3210000.0,"seg_com":-1333552.0,"seg_flota":-1062685.0,"flete":-5960000.0,"comex":-336800.0,"gcom":-1716510.41,"sueldos_adm":-8330567.0,"sac_adm":-549065.0,"gv_adm":-917610.0,"alquileres":-800000.0,"luz":-5398486.39,"sistema":-307800.0,"hon_adm":-4921648.36,"libreria":0.0,"seg_adm":0.0,"sellados":0.0,"gv_otros":-2421466.76,"descuentos":-4449391.01,"hon_prod":-570503.0,"mant_limp":-20600.0,"seg_prod":0.0,"obras_soc":-3212053.06,"iibb":0.0,"imp_cheque":-3582948.25,"com_banc":-16607.7,"cargas":-46168381.4,"asimra":-578616.09,"uom":-2363106.21,"descubierto":0.0,"venta_valores":-6406019.9,"prestamos":-15502375.03,"afip_planes":-14892318.64,"afip_sct":0.0,"arba":-1041086.0,"uom_mor":0.0,"sh_mor":0.0,"despidos":0.0,"acuerdos":0.0,"redondeo":0.0,"imp_gan":0.0,"ret_eduardo":-5226000.0,"ret_facundo":-8278676.0,"ret_juanma":-5492300.0,"dif_cambio":0},"manual":{},"congeladoPor":"Excel histórico","congeladoEn":"2026-10-01T18:00:00Z"},"spotsline:2026-01":{"unidad":"spotsline","mes":"2026-01","estado":"congelado","valores":{"ventas":264353340.72,"cmv":-53538979.18,"sueldos_prod":-66387152.0,"sac_prod":-6676004.0,"gv_prod":-1976237.66,"gas_prod":-1061752.52,"mant_prod":0.0,"sueldos_com":-9028338.0,"sac_com":-442996.0,"movilidad":-2514859.79,"publicidad":-1224448.28,"comisiones":-12508783.67,"hon_com":-2500000.0,"seg_com":-1333552.0,"seg_flota":-1062685.0,"flete":-5925926.2,"comex":-410610.71,"gcom":-3629292.34,"sueldos_adm":-8742965.0,"sac_adm":-549065.0,"gv_adm":-1249680.15,"alquileres":-800000.0,"luz":-5068701.32,"sistema":0.0,"hon_adm":-5170680.0,"libreria":-78037.13,"seg_adm":0.0,"sellados":0.0,"gv_otros":-2950466.29,"descuentos":-3634077.78,"hon_prod":-570503.0,"mant_limp":-404092.62,"seg_prod":-32430.12,"obras_soc":-4360743.58,"iibb":-50854.14,"imp_cheque":-5240936.45,"com_banc":-2387077.75,"cargas":-44145749.66,"asimra":-536042.91,"uom":-2292312.44,"descubierto":0.0,"venta_valores":-10963357.97,"prestamos":-17215376.34,"afip_planes":-12133788.25,"afip_sct":0.0,"arba":-1041086.0,"uom_mor":0.0,"sh_mor":0.0,"despidos":0.0,"acuerdos":0.0,"redondeo":-25848.71,"imp_gan":0.0,"ret_eduardo":9663063.09,"ret_facundo":7881391.87,"ret_juanma":3962000.0,"dif_cambio":0},"manual":{},"congeladoPor":"Excel histórico","congeladoEn":"2026-10-01T18:00:00Z"},"spotsline:2025-12":{"unidad":"spotsline","mes":"2025-12","estado":"congelado","valores":{"ventas":260202549.12,"cmv":-108619317.33,"sueldos_prod":-69148259.0,"sac_prod":0.0,"gv_prod":-2123722.32,"gas_prod":-1440468.66,"mant_prod":-1137940.0,"sueldos_com":-8463304.0,"sac_com":0.0,"movilidad":-2336584.61,"publicidad":-340000.0,"comisiones":-14832717.0,"hon_com":-3300000.0,"seg_com":-1333552.0,"seg_flota":-1062685.0,"flete":-4749980.61,"comex":-39193.01,"gcom":-2979359.58,"sueldos_adm":-9815670.0,"sac_adm":0.0,"gv_adm":-7255784.05,"alquileres":-800000.0,"luz":-4535329.46,"sistema":0.0,"hon_adm":-5049335.66,"libreria":-73021.0,"seg_adm":0.0,"sellados":-70582.77,"gv_otros":-2925805.61,"descuentos":-4453783.87,"hon_prod":-742786.9,"mant_limp":-53339.76,"seg_prod":0.0,"obras_soc":-3728661.55,"iibb":0.0,"imp_cheque":-12648667.51,"com_banc":-4733776.51,"cargas":-41190577.46,"asimra":-485722.71,"uom":-2086734.88,"descubierto":0.0,"venta_valores":-4791964.05,"prestamos":-11771572.32,"afip_planes":-7597716.18,"afip_sct":0.0,"arba":-1041086.0,"uom_mor":0.0,"sh_mor":0.0,"despidos":0.0,"acuerdos":0.0,"redondeo":3687907.8,"imp_gan":0.0,"ret_eduardo":6163278.74,"ret_facundo":4151544.63,"ret_juanma":7848048.98,"dif_cambio":0},"manual":{},"congeladoPor":"Excel histórico","congeladoEn":"2026-10-01T18:00:00Z"},"spotsline:2025-11":{"unidad":"spotsline","mes":"2025-11","estado":"congelado","valores":{"ventas":281652431.32,"cmv":-84683508.0,"sueldos_prod":-69266857.0,"sac_prod":0.0,"gv_prod":-4116458.17,"gas_prod":-1557805.19,"mant_prod":-207616.0,"sueldos_com":-11070181.0,"sac_com":0.0,"movilidad":-4627636.57,"publicidad":129980.0,"comisiones":-14292694.75,"hon_com":-990000.0,"seg_com":-1333552.0,"seg_flota":-1062685.0,"flete":-5641629.0,"comex":-7222191.37,"gcom":-2538980.9,"sueldos_adm":-8624423.0,"sac_adm":0.0,"gv_adm":-5276185.87,"alquileres":-800000.0,"luz":-4771780.66,"sistema":0.0,"hon_adm":-7506113.31,"libreria":0.0,"seg_adm":-6700.0,"sellados":-98124.34,"gv_otros":-3078654.29,"descuentos":-4950031.81,"hon_prod":-536050.0,"mant_limp":-109669.43,"seg_prod":0.0,"obras_soc":-3084105.33,"iibb":0.0,"imp_cheque":-4321603.68,"com_banc":-4215602.93,"cargas":-38726706.1,"asimra":-482462.07,"uom":-1946884.43,"descubierto":0.0,"venta_valores":-4129668.75,"prestamos":-19331492.83,"afip_planes":-7791309.47,"afip_sct":0.0,"arba":-1041086.0,"uom_mor":0.0,"sh_mor":0.0,"despidos":0.0,"acuerdos":0.0,"redondeo":676360.43,"imp_gan":0.0,"ret_eduardo":5977150.01,"ret_facundo":5520000.0,"ret_juanma":7136900.0,"dif_cambio":0},"manual":{},"congeladoPor":"Excel histórico","congeladoEn":"2026-10-01T18:00:00Z"},"spotsline:2025-10":{"unidad":"spotsline","mes":"2025-10","estado":"congelado","valores":{"ventas":291299805.21,"cmv":-81539160.52,"sueldos_prod":-74918872.0,"sac_prod":0.0,"gv_prod":-2044572.01,"gas_prod":-1697575.01,"mant_prod":-1097499.69,"sueldos_com":-11017329.0,"sac_com":0.0,"movilidad":-5804537.58,"publicidad":-405000.0,"comisiones":-27439035.63,"hon_com":0.0,"seg_com":-1333552.0,"seg_flota":-1062685.0,"flete":-4831616.33,"comex":-923673.43,"gcom":-2577575.82,"sueldos_adm":-8992548.0,"sac_adm":0.0,"gv_adm":-4201495.64,"alquileres":0.0,"luz":-4262602.32,"sistema":0.0,"hon_adm":-4910128.48,"libreria":-84513.87,"seg_adm":-20100.0,"sellados":-125541.38,"gv_otros":-2630191.75,"descuentos":-4044535.26,"hon_prod":-536050.0,"mant_limp":0.0,"seg_prod":0.0,"obras_soc":-3433628.26,"iibb":0.0,"imp_cheque":-2485443.4,"com_banc":-6114429.32,"cargas":-41771443.64,"asimra":-484767.6,"uom":-2158627.76,"descubierto":-405.77,"venta_valores":-3935036.99,"prestamos":0.0,"afip_planes":0.0,"afip_sct":0.0,"arba":-1041086.0,"uom_mor":0.0,"sh_mor":0.0,"despidos":0.0,"acuerdos":0.0,"redondeo":-143704.11,"imp_gan":0.0,"ret_eduardo":3000000.0,"ret_facundo":0.0,"ret_juanma":0.0,"dif_cambio":0},"manual":{},"congeladoPor":"Excel histórico","congeladoEn":"2026-10-01T18:00:00Z"},"spotsline:2026-10":{"unidad":"spotsline","mes":"2026-10","estado":"abierto","odoo":{"4.1.1.01.010":{"n":"Venta de mercadería","v":3012885.01},"5.1.1.01.030":{"n":"Compra de mercadería","v":-150000.0},"5.1.2.01.030":{"n":"Gastos Varios Producción","v":0.0},"5.1.2.01.050":{"n":"Servicio Eléctrico Producción","v":0.0},"5.1.2.01.070":{"n":"Servicio de Gas Producción","v":0.0},"5.1.2.01.090":{"n":"Mantenimiento y Reparaciones Producción","v":-7335.47},"5.2.1.01.050":{"n":"Movilidad y viáticos","v":0.0},"5.2.1.01.060":{"n":"Publicidad","v":0.0},"5.2.1.01.070":{"n":"Comisiones Pagadas","v":-1200000.0},"5.2.1.01.110":{"n":"Honorarios Comercial","v":0.0},"5.2.1.01.140":{"n":"Flete/Expresos","v":0.0},"5.2.1.02.031":{"n":"Gastos comerciales","v":-990000.0},"5.3.1.01.030":{"n":"Gastos varios Administrativos","v":0.0},"5.3.1.01.090":{"n":"Sistema y Software","v":0.0},"5.3.1.01.110":{"n":"Honorarios Administración","v":0.0},"5.3.1.01.120":{"n":"Artículos de librería","v":0.0},"5.3.1.01.130":{"n":"Seguros Administración","v":0.0},"5.3.1.01.140":{"n":"Sellados y Certificaciones","v":0.0},"5.01.01.022":{"n":"GASTOS VARIOS","v":-80000.0},"5.01.01.024":{"n":"DESCUENTO OTORGADO","v":-215233.98},"5.1.2.01.100":{"n":"Higiene y Seguridad","v":0.0},"5.1.2.01.120":{"n":"Mantenimiento y limpieza","v":0.0},"5.1.2.01.140":{"n":"Obras Sociales","v":0.0},"5.6.1.01.060":{"n":"Gastos Bancarios","v":0.0},"4.2.1.01.020":{"n":"Diferencias de cambio","v":0.0},"5.6.1.01.020":{"n":"Intereses por préstamos","v":0.0},"5.6.1.01.050":{"n":"Intereses fiscales","v":0.0},"4.2.1.01.030":{"n":"Ajuste por redondeo","v":13.48}},"manual":{},"odooImportado":"2026-10-01T18:00:00Z"},"spotsline:2026-09":{"unidad":"spotsline","mes":"2026-09","estado":"abierto","odoo":{"4.1.1.01.010":{"n":"Venta de mercadería","v":251009005.4},"5.1.1.01.030":{"n":"Compra de mercadería","v":-60734595.93},"5.1.2.01.030":{"n":"Gastos Varios Producción","v":-621000.0},"5.1.2.01.050":{"n":"Servicio Eléctrico Producción","v":0.0},"5.1.2.01.070":{"n":"Servicio de Gas Producción","v":-1549221.76},"5.1.2.01.090":{"n":"Mantenimiento y Reparaciones Producción","v":-735795.65},"5.2.1.01.050":{"n":"Movilidad y viáticos","v":-211082.49},"5.2.1.01.060":{"n":"Publicidad","v":-200000.0},"5.2.1.01.070":{"n":"Comisiones Pagadas","v":-11766192.83},"5.2.1.01.110":{"n":"Honorarios Comercial","v":-800000.0},"5.2.1.01.140":{"n":"Flete/Expresos","v":-6082089.79},"5.2.1.02.031":{"n":"Gastos comerciales","v":-385341.97},"5.3.1.01.030":{"n":"Gastos varios Administrativos","v":2500.0},"5.3.1.01.090":{"n":"Sistema y Software","v":-2019775.0},"5.3.1.01.110":{"n":"Honorarios Administración","v":-7827662.0},"5.3.1.01.120":{"n":"Artículos de librería","v":-23300.0},"5.3.1.01.130":{"n":"Seguros Administración","v":-344964.0},"5.3.1.01.140":{"n":"Sellados y Certificaciones","v":-21100.0},"5.01.01.022":{"n":"GASTOS VARIOS","v":-794472.0},"5.01.01.024":{"n":"DESCUENTO OTORGADO","v":-3869558.39},"5.1.2.01.100":{"n":"Higiene y Seguridad","v":-351000.0},"5.1.2.01.120":{"n":"Mantenimiento y limpieza","v":-367432.87},"5.1.2.01.140":{"n":"Obras Sociales","v":-1132250.83},"5.6.1.01.060":{"n":"Gastos Bancarios","v":0.0},"4.2.1.01.020":{"n":"Diferencias de cambio","v":41100.0},"5.6.1.01.020":{"n":"Intereses por préstamos","v":0.0},"5.6.1.01.050":{"n":"Intereses fiscales","v":0.0},"4.2.1.01.030":{"n":"Ajuste por redondeo","v":1187625.0}},"manual":{},"odooImportado":"2026-10-01T18:00:00Z"}};
@@ -524,6 +563,7 @@ function fmt(v,ventas){
 }
 function esc(s){return String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));}
 function usuario(){
+  if(YO) return YO.nombre;
   let u=""; try{u=localStorage.getItem("eerr_usuario")||"";}catch(_){}
   if(!u){ u=(prompt("¿Cómo te llamás? (queda registrado al congelar meses)")||"").trim()||"Sin nombre"; try{localStorage.setItem("eerr_usuario",u);}catch(_){} }
   return u;
@@ -551,14 +591,15 @@ const local={
   async cargar(){ let d=null; try{d=JSON.parse(localStorage.getItem(this.KEY)||'null');}catch(_){} return d||JSON.parse(JSON.stringify(SEED)); },
   async guardar(lista){ const d=await this.cargar(); lista.forEach(x=>d[x.id]=x.valor); try{localStorage.setItem(this.KEY,JSON.stringify(d));}catch(_){} }
 };
-async function guardar(cambios){ // {id: doc}
+async function guardar(cambios,sistema){ // {id: doc}
+  if(!sistema&&!PERM.editar&&!PERM.bloquear){ st("Tu usuario es de solo lectura: no se guardó el cambio.",true); throw new Error("solo lectura"); }
   const lista=Object.entries(cambios).map(([id,valor])=>({id,valor}));
   Object.assign(docs,cambios); render();
   try{ await store.guardar(lista); }
   catch(e){ st("No se pudo guardar en "+store.nombre+": "+e.message,true); throw e; }
 }
 let PEDIDOS=[];
-function tomarConfig(){ const pd=docs.pedidos; delete docs.pedidos; PEDIDOS=(pd&&pd.lista)||[]; actualizarPedCount(); const c=docs.config; delete docs.config; CONFIG={ubicacion:{},...(c||{})}; if(!CONFIG.ubicacion) CONFIG.ubicacion={}; armarEstructura(); }
+function tomarConfig(){ const us=docs.usuarios; delete docs.usuarios; USUARIOS=(us&&us.lista)||[]; const pd=docs.pedidos; delete docs.pedidos; PEDIDOS=(pd&&pd.lista)||[]; actualizarPedCount(); const c=docs.config; delete docs.config; CONFIG={ubicacion:{},...(c||{})}; if(!CONFIG.ubicacion) CONFIG.ubicacion={}; armarEstructura(); }
 async function guardarConfig(nueva){
   const prev=CONFIG; CONFIG=nueva; armarEstructura(); render();
   try{ await store.guardar([{id:"config",valor:{...nueva,actualizadoPor:usuario(),actualizadoEn:new Date().toISOString()}}]); }
@@ -589,9 +630,10 @@ async function cargarTodo(){
       b.onclick=async()=>{ b.disabled=true; await guardar(JSON.parse(JSON.stringify(SEED))); st("Histórico inicial cargado en Supabase."); };
       $("#status").appendChild(b);
     } else st("");
-    autoSyncCheques();
+    controlarSesion();
+    autoSyncCheques(); cargarHistoricoSpl();
   }catch(e){
-    console.error(e); store=local; docs=await local.cargar(); tomarConfig();
+    console.error(e); store=local; docs=await local.cargar(); tomarConfig(); controlarSesion();
     $("#conn").textContent="Sin conexión a Supabase: guardando en este navegador"; $("#conn").className="conn bad";
     st("Detalle: "+e.message+". Revisá que exista la tabla '"+TABLA_EERR+"'.",true);
   }
@@ -616,6 +658,7 @@ function valorU(u,m,l){
   }
   if(man==null) return l.cero?{v:0,src:"manual"}:{v:null,src:"pend"};
   const org=(d.origen||{})[l.id];
+  if(org==="estimado") return {v:man,src:"est",org};
   return {v:man,src:(org==="cheques"||org==="cashflow"||org==="socios"||org==="cmv"||org==="boletas")?"sync":"manual",org};
 }
 function valor(u,m,l){
@@ -676,7 +719,9 @@ function programarResumen(){
 
 /* ---------- Render ---------- */
 function renderUnidades(){
-  $("#unidades").innerHTML=[...UNIDADES.map(x=>[x.id,x.n]),['cons','Consolidado'],['ayuda','Ayuda']].map(([id,n])=>`<button data-unidad="${id}" aria-pressed="${id==='ayuda'?vista==='ayuda':(vista==='eerr'&&unidad===id)}"${id==='ayuda'?' style="margin-left:auto"':''}>${esc(n)}</button>`).join("");
+  const vis=[...UNIDADES.map(x=>[x.id,x.n]),['cons','Consolidado']].filter(([id])=>PERM.unidades.includes(id));
+  if(vista==='eerr'&&!PERM.unidades.includes(unidad)&&vis.length) unidad=vis[0][0];
+  $("#unidades").innerHTML=[...vis,['ayuda','Ayuda']].map(([id,n])=>`<button data-unidad="${id}" aria-pressed="${id==='ayuda'?vista==='ayuda':(vista==='eerr'&&unidad===id)}"${id==='ayuda'?' style="margin-left:auto"':''}>${esc(n)}</button>`).join("");
   $("#vistaEERR").hidden=vista!=='eerr'; $("#vistaAyuda").hidden=vista!=='ayuda';
   const ro=unidad==='cons'; $("#impLbl").hidden=false; $("#btnCheques").disabled=false;
   $("#desc").textContent= ro?"Suma línea por línea de Spotsline y SPL Distribuidora. Para cargar o congelar, entrá a cada unidad.":"Lo contable sale del export de Odoo; las líneas celestes se cargan desde su propia fuente. Los meses congelados quedan fijos.";
@@ -712,7 +757,7 @@ function render(){
   renderAlertBar(ids);
   if(lupaRef&&!$("#lupa").hidden){ if(!ids.includes(lupaRef.m)) cerrarLupa(); else if(lupaRef.kind==="alertas") abrirAlertas(lupaRef.m); else abrirLupa(lupaRef.m,lupaRef.kind,lupaRef.id); }
 }
-function editable(m,l){ const d=getDoc(unidad,m); return unidad!=='cons' && l.s!=="formula" && d && d.estado!=="congelado" && (l.s!=="odoo"||!tieneOdoo(d)); }
+function editable(m,l){ const d=getDoc(unidad,m); return PERM.editar && unidad!=='cons' && l.s!=="formula" && d && d.estado!=="congelado" && (l.s!=="odoo"||!tieneOdoo(d)); }
 /* ---------- Alertas ---------- */
 let ALERTAS={};
 const umbral=()=>({pct:(CONFIG.alertas&&CONFIG.alertas.pct)||30, monto:(CONFIG.alertas&&CONFIG.alertas.monto)||500000});
@@ -795,7 +840,7 @@ function renderKpis(ids,C){
 }
 function srcTxt(x,l){
   const f=FUENTES[l.s]?FUENTES[l.s].t:"";
-  return {odoo:"Odoo",manual:"Carga manual",formula:"Fórmula",sync:x.org==="boletas"?"VEP / boleta (PDF)":x.org==="cmv"?"Estadísticas de facturas":x.org==="cashflow"?"Cash Flow":x.org==="socios"?"Pagos Odoo + tarjetas":"Panel de cheques",frozen:"Mes congelado",cons:"Suma de ambas unidades",pend:"Falta cargar"+(f?": "+f:"")}[x.src]+(x.parcial?" (una unidad tiene pendientes)":"");
+  return {odoo:"Odoo",manual:"Carga manual",formula:"Fórmula",est:"Estimado del Cash Flow (falta la boleta o el VEP)",sync:x.org==="boletas"?"VEP / boleta (PDF)":x.org==="cmv"?"Estadísticas de facturas":x.org==="cashflow"?"Cash Flow":x.org==="socios"?"Pagos Odoo + tarjetas":"Panel de cheques",frozen:"Mes congelado",cons:"Suma de ambas unidades",pend:"Falta cargar"+(f?": "+f:"")}[x.src]+(x.parcial?" (una unidad tiene pendientes)":"");
 }
 function renderFuentes(ids,C){
   const el=$("#fuentes");
@@ -811,11 +856,13 @@ function renderFuentes(ids,C){
       const ceros=Object.values(alertasMes(u,m)).filter(a=>a.tipo==="falta"&&a.cero&&!a.rev);
       h+=`<div class="pend-mes${sel===m?" foco":""}"><h3><span>${nombreMes(m)} <span class="code">${ix===0?"en curso":"abierto"}</span></span><span class="pill${falt.length||ceros.length?"":" ok"}">${falt.length?falt.length+" sin cargar":ceros.length?"Revisar "+ceros.length:"Completo"}</span></h3>
         <div class="prog" title="${ok} de ${lin.length} líneas con dato"><span style="width:${pct}%"></span></div><p class="sub prog-t">${ok} de ${lin.length} líneas con dato (${pct}%) · <button type="button" class="lnk" data-ver-mes="${u}|${m}">Ver en la tabla</button></p>`;
-      if(!falt.length&&!ceros.length){ h+=`<p class="sub">Todas las líneas tienen dato. Revisá las alertas y congelalo.</p></div>`; return; }
+      if(!falt.length&&!ceros.length&&!lin.some(l=>c.lin[l.id].src==="est")){ h+=`<p class="sub">Todas las líneas tienen dato. Revisá las alertas y congelalo.</p></div>`; return; }
       const grupos={}; falt.forEach(l=>{const k=l.s==="odoo"?"odoo":l.s;(grupos[k]=grupos[k]||[]).push(l);});
       Object.entries(grupos).forEach(([k,ls])=>{
         h+=`<div class="fuente"><h4>${esc(k==="odoo"?"Export de Odoo":FUENTES[k].t)} <span class="code">(${ls.length})</span></h4><span class="tag">${esc(k==="odoo"?"Falta importar el export de Odoo de este mes.":FUENTES[k].q)}</span><ul class="pend-list">${ls.map(l=>`<li><button type="button" class="lnk" data-go-u="${u}" data-go="${m}|l|${l.id}">${esc(l.n)}${{prod:" (producción)",com:" (comercial)",adm:" (administración)"}[l.b]||""}</button></li>`).join("")}</ul></div>`;
       });
+      const ests=lin.filter(l=>c.lin[l.id].src==="est");
+      if(ests.length) h+=`<div class="fuente"><h4 style="color:#f5d27a">≈ Con valor estimado del Cash Flow <span class="code">(${ests.length})</span></h4><span class="tag">Falta subir la boleta o el VEP para reemplazar el estimado.</span><ul class="pend-list">${ests.map(l=>`<li><button type="button" class="lnk" data-go-u="${u}" data-go="${m}|l|${l.id}">${esc(l.n)}</button></li>`).join("")}</ul></div>`;
       if(ceros.length) h+=`<div class="fuente"><h4 style="color:var(--neg)">⚠ En cero, pero siempre tienen valor <span class="code">(${ceros.length})</span></h4><span class="tag">Tienen dato, pero da cero cuando los meses anteriores no. Revisá si falta registrarlo.</span><ul class="pend-list">${ceros.map(a=>`<li><button type="button" class="lnk warn" data-go-u="${u}" data-go="${m}|l|${a.id}">${esc(LINEAS[a.id].n)}</button></li>`).join("")}</ul></div>`;
       h+=`</div>`;
     });
@@ -877,7 +924,7 @@ function lupaLinea(u,m,l){
     if(x.src==="pend") return h+`<p class="sub">Falta ${esc(bl.n)} para poder calcularla.</p><p><button type="button" class="lnk" data-go="${m}|l|${bl.id}">Ir a ${esc(bl.n)}</button></p>`;
     return h+`<div class="det"><table><tbody><tr class="clk" data-go="${m}|l|${bl.id}"><td>${esc(bl.n)}</td><td class="num">${fmtP.format(x.base)}</td></tr>${l.fx.div.map(dv=>`<tr><td>÷ ${dv}</td><td class="num"></td></tr>`).join("")}<tr class="tot"><td>${esc(l.n)}</td><td class="num">${fmtP.format(x.v)}</td></tr></tbody></table></div>`; }
   if(x.src==="odoo"){
-    const ajs=(d.ajustes||{})[l.id]||[], puede=u===unidad&&unidad!=='cons'&&d.estado!=="congelado";
+    const ajs=(d.ajustes||{})[l.id]||[], puede=PERM.editar&&u===unidad&&unidad!=='cons'&&d.estado!=="congelado";
     h+=`<p class="sub">Export de Odoo${d.odooImportado?" importado el "+new Date(d.odooImportado).toLocaleDateString("es-AR"):""}.</p>`+tablaOdoo(d,l);
     h+=`<h4>Ajustes manuales</h4>`+(ajs.length?`<div class="det"><table><tbody>${ajs.map(a=>`<tr><td>${esc(a.nota||"(sin nota)")}<br><span class="code">${esc(a.por||"")}${a.en?" · "+new Date(a.en).toLocaleString("es-AR"):""}</span></td><td class="num">${fmtP.format(a.v)}</td>${puede?`<td style="width:28px"><button type="button" class="lnk" data-ajdel="${a.id}" title="Quitar ajuste">✕</button></td>`:""}</tr>`).join("")}<tr class="tot"><td>Total línea (Odoo + ajustes)</td><td class="num">${fmtP.format(x.v)}</td>${puede?"<td></td>":""}</tr></tbody></table></div>`:`<p class="sub">Sin ajustes.</p>`);
     if(puede) h+=`<section class="dws edit"><h3>Agregar ajuste</h3><label class="sub" for="ajV">Importe (gastos en negativo)</label><input id="ajV" inputmode="decimal" placeholder="-577.000"><label class="sub" for="ajN" style="display:block;margin-top:8px">Nota</label><input id="ajN" style="text-align:left" placeholder="Ej.: OSDE socios"><div class="row"><button class="btn" id="ajOk" type="button">Agregar ajuste</button></div></section>`;
@@ -886,11 +933,14 @@ function lupaLinea(u,m,l){
   if(x.src==="sync"){
     if(org==="socios"){ const g={pagos:(det||[]).filter(r=>r.g==="pagos"),tdc:(det||[]).filter(r=>r.g==="tdc")};
       return h+`<p class="sub">${d.pagosSync?`Pagos de Odoo aplicados el ${new Date(d.pagosSync).toLocaleString("es-AR")}`:"Pagos de Odoo: sin importar"}. ${d.tdcSync?`Tarjetas aplicadas el ${new Date(d.tdcSync).toLocaleString("es-AR")}`:"Tarjetas: sin importar"}.</p>`+tablaDet(det); }
-    if(org==="boletas") return h+`<p class="sub">Cargado desde PDF el ${d.boletasSync?new Date(d.boletasSync).toLocaleString("es-AR"):""}.</p>`+tablaDet(det);
+    if(org==="boletas"){ const E=d.estimados||{}; let e=E[l.id], nota="";
+      const base=l.id.replace(/_vida$/,""); if((base==="uom"||base==="asimra")&&E[base+"_vida"]&&Math.abs(E[base+"_vida"].v)<0.5&&E[base]){ const real=(valorU(u,m,LINEAS[base]).v||0)+(valorU(u,m,LINEAS[base+"_vida"]).v||0); nota=` El Cash Flow trae ${LINEAS[base].n} y su seguro de vida juntos: estimado $${fmtP.format(E[base].v)} contra $${fmtP.format(real)} de las dos boletas (diferencia ${fmtP.format(real-E[base].v)}).`; e=null; }
+      return h+`<p class="sub">Cargado desde PDF el ${d.boletasSync?new Date(d.boletasSync).toLocaleString("es-AR"):""}.${e?` Estimado en el Cash Flow: $${fmtP.format(e.v)} (diferencia ${fmtP.format(x.v-e.v)}).`:""}${nota}</p>`+tablaDet(det); }
     if(org==="cmv") return h+`<p class="sub">Archivo "${esc(d.cmvArchivo||"")}", aplicado el ${d.cmvSync?new Date(d.cmvSync).toLocaleString("es-AR"):""}.${d.cmvInfo?` Ventas del reporte $${fmtP.format(d.cmvInfo.ventas)} · margen ${fmtPct.format(d.cmvInfo.ventas?d.cmvInfo.margen/d.cmvInfo.ventas:0)} · ${fmtP.format(d.cmvInfo.lineas)} líneas.`:""}</p>`+tablaDet(det);
     const cuando=org==="cashflow"?(d.cashflowSync&&`Cash Flow "${esc(d.cashflowArchivo||"")}", aplicado el ${new Date(d.cashflowSync).toLocaleString("es-AR")}`):(d.chequesSync&&`Panel de cheques, aplicado el ${new Date(d.chequesSync).toLocaleString("es-AR")}`);
     return h+`<p class="sub">${cuando||""}</p>`+(det?tablaDet(det):`<p class="sub">Se aplicó antes de guardar el detalle. Volvé a importar para verlo.</p>`);
   }
+  if(x.src==="est") return h+`<div class="al-box var"><b>≈ Valor estimado</b> tomado del Cash Flow (solapa Sueldos y CCSS). Se reemplaza cuando subas la boleta o el VEP con <em>Importar VEP y boletas</em>.</div>`+tablaDet(det);
   if(x.src==="manual"){ const mi=(d.manualInfo||{})[l.id]; return h+`<p class="sub">${l.cero&&(d.manual||{})[l.id]==null?"Sin fuente: arranca en 0.":"Carga manual"+(mi?` de ${esc(mi.por)} el ${new Date(mi.en).toLocaleString("es-AR")}`:"")+"."}</p>`; }
   return h+`<p class="sub">Todavía no hay dato cargado.</p>`;
 }
@@ -948,14 +998,16 @@ async function guardarLupa(){
 function cerrarLupa(){ $("#lupa").hidden=true; lupaRef=null; document.querySelectorAll("td.lupa-on").forEach(x=>x.classList.remove("lupa-on")); }
 
 /* ---------- Congelar ---------- */
-async function congelar(u,m){
+async function congelar(u,m){ if(!PERM.bloquear){ st("Tu usuario no tiene permiso para congelar.",true); return; }
   const d=getDoc(u,m), c=calcMes(u,m);
   if(c.pend && !confirm(`${nombreMes(m)} tiene ${c.pend} líneas pendientes. Si lo congelás quedan en cero. ¿Seguir?`)) return;
+  const ests=Object.values(LINEAS).filter(l=>aplica(l,u)&&c.lin[l.id]&&c.lin[l.id].src==="est");
+  if(ests.length && !confirm(`${nombreMes(m)} tiene ${ests.length} líneas con valor ESTIMADO del Cash Flow (${ests.map(l=>l.n).join(", ")}). Falta la boleta o el VEP. ¿Congelar igual?`)) return;
   const valores={}; ORDEN.forEach(id=>valores[id]=c.lin[id].v??0);
   const nd={...d,estado:"congelado",valores,congeladoPor:usuario(),congeladoEn:new Date().toISOString()};
   await guardar({[u+':'+m]:nd}); st(`${nombreMes(m)} congelado.`);
 }
-async function descongelar(u,m){
+async function descongelar(u,m){ if(!PERM.bloquear){ st("Tu usuario no tiene permiso para descongelar.",true); return; }
   const d=getDoc(u,m);
   if(!confirm(`¿Descongelar ${nombreMes(m)} de ${nombreUnidad(u)}? Volverá a calcularse con Odoo y las fuentes, y podrá pisarse al importar.`)) return;
   const man={...(d.manual||{})};
@@ -1058,7 +1110,7 @@ async function autoSyncCheques(){
           if(org[k]!=="cheques"||man[k]==null||Math.abs(man[k]-nv)>=0.01){ man[k]=nv; org[k]="cheques"; det[k]=((DT[m]||{})[k])||[]; cambio=true; } });
         if(cambio) cambios[x.id+':'+m]={...d,manual:man,origen:org,detalle:det,chequesSync:now}; }); });
     const n=Object.keys(cambios).length;
-    if(n){ await guardar(cambios); }
+    if(n){ await guardar(cambios,true); }
     const t=$("#chqAuto"); if(t) t.textContent=`Panel de cheques sincronizado${n?` (${n} ${n===1?"mes actualizado":"meses actualizados"})`:""} · ${new Date().toLocaleTimeString("es-AR",{hour:"2-digit",minute:"2-digit"})}`;
   }catch(e){ console.warn("Sync cheques:",e); const t=$("#chqAuto"); if(t) t.textContent="No se pudo leer el panel de cheques"; }
 }
@@ -1152,7 +1204,26 @@ function leerCashflow(wb){
     rows.slice(1).forEach(r=>{ if(!r) return; const en=norm(r[c.emp]); const e=en==="socios"?"socios":cfEmpresa(r[c.emp]); if(!e) return; const m=cfMes(r[c.vto]); if(!m) return;
       const tar=String(r[c.tar]||"").trim(); TDC.push({e,m,f:cfFecha(r[c.vto]),tar,k:e==="socios"?socioDeTarjeta(tar):"tc_corp",usd:/\((usd|uds)\)/i.test(tar),imp:cfNum(r[c.imp])}); });
   }catch(e){ console.warn(e); }
-  return {R,D,ign,cad,TDC};
+  // Cargas sociales, sindicatos y (si vienen por área) sueldos: solapa "Sueldos y CCSS", por Mes Devengado. Son estimados hasta que se carga la boleta/VEP.
+  const E={}, ED={}; const addE=(u,m,k,v,det)=>{ (((E[u]=E[u]||{})[m]=E[u][m]||{})[k])=r2((E[u][m][k]||0)+v); ((((ED[u]=ED[u]||{})[m]=ED[u][m]||{})[k]=ED[u][m][k]||[])).push({...det,v:r2(v)}); };
+  try{
+    const rows=cfHoja(wb,'Sueldos y CCSS'), h=rows[0]||[]; const c={emp:cfCol(h,'Sueldos y CCSS',['empresa']),ref:cfCol(h,'Sueldos y CCSS',['referencia']),mes:cfCol(h,'Sueldos y CCSS',['mes','devengado']),imp:cfCol(h,'Sueldos y CCSS',['importe']),vto:cfCol(h,'Sueldos y CCSS',['vencimiento'])};
+    let ce=-1, cc=-1; try{ce=cfCol(h,'Sueldos y CCSS',['estado','pago']);}catch(_){} try{cc=cfCol(h,'Sueldos y CCSS',['comentarios']);}catch(_){}
+    rows.slice(1).forEach(r=>{ if(!r) return; const u=cfEmpresa(r[c.emp]); const m=cfMes(r[c.mes]); if(!u||!m) return;
+      const ref=txt(r[c.ref]), n=norm(ref); const v=-cfNum(r[c.imp]); if(!v) return;
+      const det={h:"Cash Flow · Sueldos y CCSS",f:cfFecha(r[c.vto]),c:ref,x:[ce>=0&&r[ce]?("Pagado: "+txt(r[ce])):"",cc>=0&&r[cc]?txt(r[cc]):""].filter(Boolean).join(" · ")};
+      let k=null;
+      if(n==="ss"||n.startsWith("ss ")||n.includes("seg social")||n.includes("os art")||n==="art"||n.startsWith("art ")) k="cargas";
+      else if(n.startsWith("uom")) k=/sv|vida|sepelio/.test(n)?"uom_vida":"uom";
+      else if(n.startsWith("asimra")) k=/vida/.test(n)?"asimra_vida":"asimra";
+      else if(n.startsWith("osecac")) k="osecac"; else if(n.startsWith("faecys")) k="faecys"; else if(n.startsWith("inacap")) k="inacap"; else if(n==="sec"||n.startsWith("sec ")) k="sec";
+      else if(n.includes("sueldo")){ if(/prod/.test(n)) k="sueldos_prod"; else if(/comerc/.test(n)) k="sueldos_com"; else if(/adm/.test(n)) k="sueldos_adm"; }
+      if(k&&aplica(LINEAS[k],u)){
+        const junto=(k==="uom"&&!/cuota|sindical/.test(n))||(k==="asimra"&&!/aporte/.test(n));
+        addE(u,m,k,v,junto?{...det,x:[det.x,"Incluye seguro de vida (el Cash Flow lo trae junto)"].filter(Boolean).join(" · ")}:det);
+        if(junto) addE(u,m,k+"_vida",0,{...det,c:"Incluido en la línea "+LINEAS[k].n+" (el Cash Flow lo trae junto)"}); } });
+  }catch(e){ console.warn("Sueldos y CCSS:",e); }
+  return {R,D,ign,cad,TDC,E,ED};
 }
 let cfProp=null;
 function tcActual(){ const n=parseNum($("#tdcTc")?$("#tdcTc").value:""); return n&&!Number.isNaN(n)?n:null; }
@@ -1185,7 +1256,7 @@ async function abrirCashflow(file){
     if(typeof XLSX==="undefined") throw new Error("No se pudo cargar el lector de Excel.");
     st("Leyendo "+file.name+"…");
     const wb=XLSX.read(await file.arrayBuffer(),{type:"array"});
-    const {R,D,ign,cad,TDC}=leerCashflow(wb); cfProp={R,D,TDC,file:file.name}; st("");
+    const {R,D,ign,cad,TDC,E,ED}=leerCashflow(wb); cfProp={R,D,TDC,E,ED,file:file.name}; st("");
     const hoy=new Date(), mesHoy=hoy.getFullYear()+"-"+String(hoy.getMonth()+1).padStart(2,"0");
     const docMeses=Object.values(docs).map(d=>d.mes).sort(), desde=docMeses[0]||mesHoy;
     let h="";
@@ -1203,6 +1274,13 @@ async function abrirCashflow(file){
     });
     const ignTxt=Object.entries(ign).map(([n,c])=>`${n} (${c})`).join(", ");
     h+=`<p class="sub" style="margin-top:10px">Se toma lo que vence en cada mes según la fecha de vencimiento. Intereses en negativo (son gastos). Meses congelados no se tocan, pero se muestra la diferencia. Los meses sin datos del EERR vienen desmarcados.${ignTxt?` Filas ignoradas por empresa que no es Spotsline ni SPL: ${esc(ignTxt)}.`:""}${Object.keys(cad).length?` Cuotas excluidas por Estado Caduco: ${esc(Object.entries(cad).map(([h,n])=>h+" ("+n+")").join(", "))}.`:""}</p>`;
+    { const EK=["cargas","uom","uom_vida","asimra","asimra_vida","sec","osecac","faecys","inacap","sueldos_prod","sueldos_com","sueldos_adm"];
+      let he=""; UNIDADES.forEach(x=>{ const ms=Object.keys(E[x.id]||{}).filter(m=>getDoc(x.id,m)&&getDoc(x.id,m).estado!=="congelado").sort().reverse(); if(!ms.length) return;
+        const ks=EK.filter(k=>ms.some(m=>(E[x.id][m]||{})[k]!=null));
+        he+=`<h4>${esc(x.n)}</h4><div class="det" style="overflow-x:auto"><table class="cmp"><thead><tr><th>Mes</th>${ks.map(k=>`<th class="num">${esc(LINEAS[k].n.replace(" (Sindicato Empleados de Comercio)",""))}</th>`).join("")}</tr></thead><tbody>${ms.map(m=>{const d=getDoc(x.id,m);
+          return `<tr><td>${nombreMes(m)}</td>${ks.map(k=>{const v=(E[x.id][m]||{})[k]; const o=(d.origen||{})[k]; const fija=o==="boletas"||o==="manual";
+            return `<td class="num">${v==null?"–":fmtP.format(v)}${fija?`<br><span class="code">${o==="boletas"?"ya hay boleta: no se toca":"carga manual: no se toca"}</span>`:""}</td>`;}).join("")}</tr>`;}).join("")}</tbody></table></div>`; });
+      if(he) h+=`<section class="tdcbox"><h3 style="margin:16px 0 4px">Cargas sociales y sindicatos (solapa Sueldos y CCSS), como estimado</h3>${he}<p class="sub">Se cargan como <strong>estimado</strong> (por Mes Devengado) en los meses abiertos marcados arriba. Cuando subas el VEP o la boleta, ese valor reemplaza al estimado. No pisa lo que ya venga de una boleta o de una carga manual. Los sueldos solo se toman si la referencia dice el área (producción, comercial o administración).</p></section>`; }
     h+=`<section class="tdcbox"><h3 style="margin:16px 0 4px">Tarjetas (solapa TDC)</h3>
       <div class="chips" style="align-items:center"><span class="sub" style="margin:0">Tarjetas de socios a:</span>${UNIDADES.map((x,i)=>`<label class="chip"><input type="radio" name="tdcU" value="${x.id}" ${i===0?"checked":""}>${esc(x.n)}</label>`).join("")}
       <label class="chip">Tipo de cambio US$ <input id="tdcTc" inputmode="decimal" placeholder="ej. 1.450" value="${(()=>{try{return localStorage.getItem('eerr_tc')||""}catch(_){return ""}})()}" style="width:120px;background:var(--paper);border:1px solid #3a3a3a;border-radius:6px;padding:3px 6px;color:var(--ink)"></label></div>
@@ -1228,7 +1306,10 @@ $("#dlgCf").addEventListener("close",async()=>{
     const man={...(d.manual||{})}, org={...(d.origen||{})};
     const det={...(d.detalle||{})};
     CF_LINEAS.forEach(k=>{man[k]=((cfProp.R[u]||{})[m]||{})[k]||0; org[k]="cashflow"; det[k]=(((cfProp.D[u]||{})[m]||{})[k])||[];});
-    cambios[u+':'+m]={...d,detalle:det,manual:man,origen:org,cashflowSync:now,cashflowArchivo:cfProp.file};});
+    const est={...(d.estimados||{})};
+    Object.entries(((cfProp.E||{})[u]||{})[m]||{}).forEach(([k,v])=>{ const filas=((((cfProp.ED||{})[u]||{})[m]||{})[k])||[]; est[k]={v,filas,en:now};
+      if(org[k]==="boletas"||org[k]==="manual") return; man[k]=v; org[k]="estimado"; det[k]=filas; });
+    cambios[u+':'+m]={...d,detalle:det,manual:man,origen:org,estimados:est,cashflowSync:now,cashflowArchivo:cfProp.file};});
   try{ await guardar(cambios); st(`Datos del Cash Flow aplicados: ${sel.map(([u,m])=>nombreUnidad(u)+" "+nombreMes(m)).join(", ")}.`); }catch(_){}
   cfProp=null;
 });
@@ -1469,12 +1550,22 @@ function unidadPdf(t){ const d=(t.replace(/(\d)\s*-\s*(?=\d)/g,"$1").match(/\b\d
 function periodoPdf(t){ let m=t.match(/Per[ií]odo:\s*(\d{4})-(\d{2})/i); if(m) return m[1]+"-"+m[2];
   m=t.match(/PER[IÍ]ODO:\s*(?:PER[IÍ]ODO:\s*)?(\d{2})\s*\/\s*(\d{4})/i); if(m) return m[2]+"-"+m[1];
   m=t.match(/Tipo:\s*(\d{4})\s*\/\s*(\d{2})/i); if(m) return m[1]+"-"+m[2];
+  m=t.match(/MES\s*A[ÑN]O[\s\S]{0,160}?\b(0[1-9]|1[0-2])\s+(20\d{2})\b/i); if(m) return m[2]+"-"+m[1];
   m=t.match(/(\d{2})\/(\d{4})/); return m?m[2]+"-"+m[1]:null; }
 const VEP_COD={"301":"Aportes Seg. Social","351":"Contribuciones Seg. Social","302":"Aportes Obra Social","352":"Contribuciones Obra Social","312":"ART (LRT)","28":"Seguro de vida colectivo","028":"Seguro de vida colectivo","360":"RENATRE","935":"Sepelio UATRE","270":"Vales alimentarios"};
 function analizarPdf(nombre,t){
   const r={archivo:nombre,unidad:unidadPdf(t),mes:periodoPdf(t),linea:null,tipo:"?",importe:null,filas:[],aviso:""};
   const n=norm(t);
-  if(!t.trim()){ r.tipo="PDF escaneado"; r.aviso="El PDF no tiene texto (es una imagen). Subí el VEP o cargalo a mano."; return r; }
+  if(!t.trim()){ // PDF imagen: se deduce del nombre del archivo y el importe se tipea mirando el comprobante
+    const fn=norm(nombre); r.manual=true;
+    r.unidad=/\bspl\b/.test(fn)?"spl":/spots/.test(fn)?"spotsline":null;
+    const pm=nombre.match(/(20\d{2})[-_ ]?(0[1-9]|1[0-2])(?!\d)/); r.mes=pm?pm[1]+"-"+pm[2]:null;
+    if(/uom/.test(fn)){ r.tipo=/vida|sepelio/.test(fn)?"UOM Seg. Vida":"UOM Sindical"; r.linea=/vida|sepelio/.test(fn)?"uom_vida":"uom"; }
+    else if(/asimra/.test(fn)){ r.tipo=/vida/.test(fn)?"ASIMRA Seg. Vida":"ASIMRA"; r.linea=/vida/.test(fn)?"asimra_vida":"asimra"; }
+    else if(/931|vep|sicoss/.test(fn)){ r.tipo="931"; r.linea="cargas"; }
+    else if(/osecac/.test(fn)){ r.tipo="OSECAC"; r.linea="osecac"; } else if(/faecys/.test(fn)){ r.tipo="FAECYS"; r.linea="faecys"; } else if(/inacap/.test(fn)){ r.tipo="INACAP"; r.linea="inacap"; } else if(/sec/.test(fn)){ r.tipo="SEC"; r.linea="sec"; }
+    r.aviso="PDF escaneado (imagen): mirá el comprobante y escribí el total."+(r.linea?"":" No reconocí el tipo por el nombre del archivo.");
+    return r; }
   if(/volante electr[oó]nico de pago/i.test(t)&&/SICOSS|931/i.test(t)){
     r.tipo="VEP 931"; r.linea="cargas";
     const re=/\((\d{2,3})\)\s*\$\s*([\d.]+,\d{2})/g; let m; while((m=re.exec(t))){ r.filas.push({c:`${m[1]} · ${VEP_COD[m[1]]||"Código "+m[1]}`,v:numPdf(m[2])}); }
@@ -1496,9 +1587,11 @@ function analizarPdf(nombre,t){
   } else if(n.includes("empleados de comercio")||n.includes("ceczn")){
     r.tipo="SEC"; r.linea="sec"; const m=t.match(/Primer\s*Vto\.?\s*:?\s*(\d{2}\/\d{2}\/\d{4})\s*\$\s*([\d.,]+)/i); r.importe=m?numPdf(m[2]):null;
     if(m) r.filas.push({c:`Retenciones convenio 130/75 y Res. 3/76 · 1er vto. ${m[1]}`,v:r.importe});
-  } else if(/asimra/i.test(t)){
-    r.tipo="ASIMRA"; r.linea="asimra"; const m=t.match(/(?:total a (?:depositar|pagar|transferir)|monto total|importe total)[^\d$]*\$?\s*([\d.]+,\d{2})/i); r.importe=m?numPdf(m[1]):null; if(r.importe==null) r.aviso="No encontré el total: pasame una boleta de ASIMRA para ajustar el lector.";
-    if(r.importe!=null) r.filas.push({c:"Boleta ASIMRA",v:r.importe});
+  } else if(/a\.?\s?s\.?\s?i\.?\s?m\.?\s?r\.?\s?a\b|supervisores de la industria metalmecanica/i.test(t)){
+    const vida=/seguro de vida/i.test(t); r.tipo=vida?"ASIMRA Seg. Vida":"ASIMRA"; r.linea=vida?"asimra_vida":"asimra";
+    const m=t.match(/TOTAL A PAGAR\s*\$\s*([\d.]+,\d{2})/i)||t.match(/TOTAL A INGRESAR\s*\$\s*([\d.]+,\d{2})/i); r.importe=m?numPdf(m[1]):null;
+    [["CONTRIBUCION\\s*EMPLEADOR","Contribución empleador"],["APORTE PERSONAL(?:\\s*3%)?","Aporte personal"],["INTERESES","Intereses"],["OTROS CONCEPTOS","Otros conceptos"]].forEach(([re,n])=>{ const x=t.match(new RegExp(re+"\\s*\\$\\s*([\\d.]+,\\d{2})","i")); if(x&&numPdf(x[1])) r.filas.push({c:n,v:numPdf(x[1])}); });
+    if(!r.filas.length&&r.importe!=null) r.filas.push({c:r.tipo,v:r.importe});
   } else if(/\bUOM\b|uni[oó]n obrera metal/i.test(t)){
     r.tipo="UOM"; r.linea="uom"; const m=t.match(/(?:total a (?:depositar|pagar|transferir)|monto total|importe total)[^\d$]*\$?\s*([\d.]+,\d{2})/i); r.importe=m?numPdf(m[1]):null; if(r.importe==null) r.aviso="No encontré el total: pasame una boleta de UOM para ajustar el lector.";
     if(r.importe!=null) r.filas.push({c:"Boleta UOM",v:r.importe});
@@ -1510,24 +1603,35 @@ function analizarPdf(nombre,t){
   if(r.linea&&r.unidad&&!aplica(LINEAS[r.linea],r.unidad)) r.aviso=(r.aviso?r.aviso+" ":"")+`${r.tipo} no corresponde a ${nombreUnidad(r.unidad)}.`;
   return r;
 }
-let pdfProp=null;
+let pdfProp=null, pdfArchivos=[];
+async function verPdf(i){ const tr=$("#pdfprev"+i); if(!tr) return; tr.hidden=!tr.hidden; if(tr.hidden||tr.dataset.ok) return; tr.dataset.ok="1";
+  try{ const lib=await cargarPdfjs(); const doc=await lib.getDocument({data:new Uint8Array(await pdfArchivos[i].arrayBuffer())}).promise; const pg=await doc.getPage(1);
+    const vp=pg.getViewport({scale:1.6}); const cv=document.createElement("canvas"); cv.width=vp.width; cv.height=vp.height; const ctx=cv.getContext("2d"); ctx.fillStyle="#fff"; ctx.fillRect(0,0,cv.width,cv.height);
+    await pg.render({canvasContext:ctx,viewport:vp}).promise; const im=new Image(); im.src=cv.toDataURL("image/png"); im.alt="Comprobante "+pdfArchivos[i].name; const box=$("#pdfimg"+i); box.innerHTML=""; box.appendChild(im);
+    const inp=document.querySelector(`[data-pdfimp="${i}"]`); if(inp) inp.focus(); }catch(e){ $("#pdfimg"+i).textContent="No se pudo mostrar: "+e.message; } }
+document.addEventListener("click",e=>{ const b=e.target.closest("[data-pdfver]"); if(b) verPdf(+b.dataset.pdfver); });
 async function abrirPdfs(files){
   try{
     st(`Leyendo ${files.length} PDF…`);
     const res=[]; for(const f of files){ try{ res.push(analizarPdf(f.name,await textoPdf(f))); }catch(e){ res.push({archivo:f.name,tipo:"Error",aviso:e.message,filas:[]}); } }
     pdfProp=res; st("");
-    const valido=r=>r.linea&&r.unidad&&r.mes&&r.importe!=null&&aplica(LINEAS[r.linea],r.unidad);
+    const valido=r=>r.linea&&r.unidad&&r.mes&&(r.importe!=null||r.manual)&&aplica(LINEAS[r.linea],r.unidad);
     const cuenta={}; res.filter(valido).forEach(r=>{const k=r.unidad+r.mes+r.linea; cuenta[k]=(cuenta[k]||0)+1;});
     $("#pdfBody").innerHTML=`<div class="det" style="overflow-x:auto"><table class="cmp"><thead><tr><th></th><th>Archivo</th><th>Tipo</th><th>Unidad · período</th><th>Línea</th><th class="num">Importe</th><th class="num">Valor actual</th></tr></thead><tbody>${res.map((r,i)=>{
       const ok=valido(r), d=ok&&getDoc(r.unidad,r.mes), fr=d&&d.estado==="congelado", cur=ok&&d?valorU(r.unidad,r.mes,LINEAS[r.linea]).v:null, dup=ok&&cuenta[r.unidad+r.mes+r.linea]>1;
-      return `<tr><td><input type="checkbox" data-pdf="${i}" ${ok&&!fr?"checked":""} ${!ok||fr?"disabled":""}></td><td>${esc(r.archivo)}${r.aviso||dup||fr?`<br><span class="code" style="color:${r.aviso?"var(--neg)":"#ffb347"}">${esc([r.aviso,dup?"Hay otro archivo para la misma línea y mes: se suman.":"",fr?"Mes congelado: no se toca.":""].filter(Boolean).join(" "))}</span>`:""}</td><td>${esc(r.tipo)}</td><td>${r.unidad?esc(nombreUnidad(r.unidad)):"?"} · ${r.mes?nombreMes(r.mes):"?"}${ok&&!d?' <span class="code">(nuevo)</span>':""}</td><td>${r.linea?esc(LINEAS[r.linea].n):"–"}</td><td class="num">${r.importe!=null?fmtP.format(r.importe):"–"}</td><td class="num">${cur==null?"–":fmtP.format(cur)}</td></tr>`; }).join("")}</tbody></table></div>
+      return `<tr><td><input type="checkbox" data-pdf="${i}" ${ok&&!fr?"checked":""} ${!ok||fr?"disabled":""}></td><td>${esc(r.archivo)}${r.aviso||dup||fr?`<br><span class="code" style="color:${r.aviso?"var(--neg)":"#ffb347"}">${esc([r.aviso,dup?"Hay otro archivo para la misma línea y mes: se suman.":"",fr?"Mes congelado: no se toca.":""].filter(Boolean).join(" "))}</span>`:""}</td><td>${esc(r.tipo)}</td><td>${r.unidad?esc(nombreUnidad(r.unidad)):"?"} · ${r.mes?nombreMes(r.mes):"?"}${ok&&!d?' <span class="code">(nuevo)</span>':""}</td><td>${r.linea?esc(LINEAS[r.linea].n):"–"}</td><td class="num">${r.manual&&ok?`<input class="pdfimp" data-pdfimp="${i}" inputmode="decimal" placeholder="Total" ${fr?"disabled":""}><br><button type="button" class="lnk" data-pdfver="${i}">Ver comprobante</button>`:r.importe!=null?fmtP.format(r.importe):"–"}</td><td class="num">${cur==null?"–":fmtP.format(cur)}</td></tr>${r.manual&&ok?`<tr class="pdfprev" id="pdfprev${i}" hidden><td colspan="7"><div class="pdfimg" id="pdfimg${i}">Cargando…</div></td></tr>`:""}`; }).join("")}</tbody></table></div>
       <p class="sub" style="margin-top:10px">Se carga como gasto (en negativo) en la línea y el mes del período del comprobante. Para las boletas con dos vencimientos se toma el primero. Si una línea ya tenía valor, se reemplaza por lo que suman los PDF marcados.</p>`;
+    pdfArchivos=files;
     $("#dlgPdf").showModal();
+    const prim=res.findIndex(r=>r.manual&&valido(r)); if(prim>=0) verPdf(prim);
   }catch(e){ st("No se pudieron leer los PDF: "+e.message,true); }
 }
 $("#dlgPdf").addEventListener("close",async()=>{
   if($("#dlgPdf").returnValue!=="ok"||!pdfProp) return;
-  const sel=[...document.querySelectorAll('#pdfBody input[data-pdf]:checked')].map(i=>pdfProp[+i.dataset.pdf]); if(!sel.length){pdfProp=null;return;}
+  const faltan=[];
+  const sel=[...document.querySelectorAll('#pdfBody input[data-pdf]:checked')].map(i=>{ const r=pdfProp[+i.dataset.pdf]; if(r.manual){ const v=parseNum((document.querySelector(`[data-pdfimp="${i.dataset.pdf}"]`)||{}).value||""); if(v==null||Number.isNaN(v)){ faltan.push(r.archivo); return null; } r.importe=Math.abs(v); r.filas=[{c:r.tipo+" (importe tipeado del comprobante)",v:r.importe}]; } return r; }).filter(Boolean);
+  if(faltan.length) alert("No se cargaron (falta el importe): "+faltan.join(", "));
+  if(!sel.length){pdfProp=null;return;}
   const grupos={}; sel.forEach(r=>{ const k=r.unidad+":"+r.mes; ((grupos[k]=grupos[k]||{})[r.linea]=grupos[k][r.linea]||[]).push(r); });
   const cambios={}, now=new Date().toISOString();
   Object.entries(grupos).forEach(([k,ls])=>{ const [u,m]=k.split(":"); const d=getDoc(u,m)||{unidad:u,mes:m,estado:"abierto",manual:{}};
@@ -1601,6 +1705,124 @@ $("#dlgHist").addEventListener("close",async()=>{
   histProp=null;
 });
 
+/* ---------- Usuarios y permisos ---------- */
+let USUARIOS=[], YO=null;
+const PERM_TODO={editar:true,bloquear:true,admin:true,unidades:["spotsline","spl","cons"]};
+let PERM={...PERM_TODO};
+const PRESETS={lectura:{n:"Solo lectura",editar:false,bloquear:false,admin:false},carga:{n:"Carga",editar:true,bloquear:false,admin:false},supervisor:{n:"Supervisor",editar:true,bloquear:true,admin:false},admin:{n:"Administrador",editar:true,bloquear:true,admin:true}};
+const rolDe=u=>{ const k=Object.keys(PRESETS).find(k=>PRESETS[k].editar===!!u.editar&&PRESETS[k].bloquear===!!u.bloquear&&PRESETS[k].admin===!!u.admin); return k?PRESETS[k].n:"Personalizado"; };
+async function hashPin(salt,pin){ const txt=salt+"|"+pin;
+  try{ const b=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(txt)); return [...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,"0")).join(""); }
+  catch(_){ let h=2166136261; for(const c of txt){ h^=c.charCodeAt(0); h=Math.imul(h,16777619); } return "f"+(h>>>0).toString(16); } }
+function aplicarPermisos(){
+  if(!USUARIOS.length){ PERM={...PERM_TODO}; YO=null; }
+  else if(YO){ PERM={editar:!!YO.editar,bloquear:!!YO.bloquear,admin:!!YO.admin,unidades:(YO.unidades&&YO.unidades.length)?YO.unidades:["spotsline","spl","cons"]}; }
+  else PERM={editar:false,bloquear:false,admin:false,unidades:[]};
+  document.body.classList.toggle("ro",!PERM.editar); document.body.classList.toggle("nobloq",!PERM.bloquear);
+  const c=$("#yoChip"); c.hidden=false;
+  c.innerHTML= YO?`<b>${esc(YO.nombre)}</b><span class="rolchip">${esc(rolDe(YO))}</span>`:(USUARIOS.length?"":`<span class="rolchip" style="cursor:pointer" id="sinUsr">Sin usuarios: todos con acceso total</span>`);
+  $("#btnUsuarios").hidden=!(PERM.admin); $("#btnSalir").hidden=!YO;
+}
+async function leerUsuariosRemotos(){ if(store!==remoto) return null;
+  const r=await fetch(`${SUPABASE_URL}/rest/v1/${TABLA_EERR}?id=eq.usuarios&select=valor`,{headers:supaHeaders()}); if(!r.ok) throw new Error("HTTP "+r.status);
+  const rows=await r.json(); return (rows[0]&&rows[0].valor&&rows[0].valor.lista)||[]; }
+async function guardarUsuarios(mutar){
+  try{ const rem=await leerUsuariosRemotos(); if(rem) USUARIOS=rem; }catch(e){ console.warn(e); }
+  USUARIOS=mutar(USUARIOS.map(x=>({...x}))); await store.guardar([{id:"usuarios",valor:{lista:USUARIOS}}]);
+  if(YO){ YO=USUARIOS.find(x=>x.usuario===YO.usuario&&x.activo!==false)||null; if(!YO) cerrarSesion(); }
+  aplicarPermisos(); render(); pintarUsuarios();
+}
+function sesionGuardada(){ try{ return JSON.parse(localStorage.getItem("eerr_sesion")||"null"); }catch(_){ return null; } }
+function controlarSesion(){
+  if(!USUARIOS.length){ aplicarPermisos(); return; }
+  const s=sesionGuardada(); const u=s&&USUARIOS.find(x=>x.usuario===s.usuario&&x.pin===s.pin&&x.activo!==false);
+  if(u){ YO=u; aplicarPermisos(); return; }
+  YO=null; aplicarPermisos(); abrirLogin();
+}
+function abrirLogin(){ const d=$("#dlgLogin"); $("#lgErr").textContent=""; $("#lgPin").value=""; if(!d.open) d.showModal(); $("#lgUser").focus(); }
+$("#dlgLogin").addEventListener("cancel",e=>{ if(USUARIOS.length&&!YO) e.preventDefault(); });
+async function ingresar(){
+  const us=norm($("#lgUser").value).replace(/\s/g,""), pin=$("#lgPin").value;
+  try{ const rem=await leerUsuariosRemotos(); if(rem) USUARIOS=rem; }catch(_){}
+  const u=USUARIOS.find(x=>x.usuario===us&&x.activo!==false);
+  if(!u||await hashPin(u.salt,pin)!==u.pin){ $("#lgErr").textContent="Usuario o clave incorrectos."; return; }
+  YO=u; try{ localStorage.setItem("eerr_sesion",JSON.stringify({usuario:u.usuario,pin:u.pin})); }catch(_){}
+  $("#dlgLogin").close(); aplicarPermisos(); render(); st(`Hola, ${u.nombre}.`);
+}
+$("#lgOk").onclick=ingresar; $("#lgPin").addEventListener("keydown",e=>{ if(e.key==="Enter") ingresar(); }); $("#lgUser").addEventListener("keydown",e=>{ if(e.key==="Enter") $("#lgPin").focus(); });
+function cerrarSesion(){ try{ localStorage.removeItem("eerr_sesion"); }catch(_){} YO=null; aplicarPermisos(); render(); if(USUARIOS.length) abrirLogin(); }
+$("#btnSalir").onclick=cerrarSesion;
+let usrEdit=null;
+function pintarUsuarios(){
+  const el=$("#usrBody"); if(!el||!$("#dlgUsr").open) return;
+  const U=[["spotsline","Spotsline"],["spl","SPL"],["cons","Consolidado"]];
+  $("#usrSub").textContent=USUARIOS.length?`${USUARIOS.filter(x=>x.activo!==false).length} activos`:"Todavía no hay usuarios: mientras no exista ninguno, todos entran con acceso total. Empezá creando el administrador.";
+  let h=USUARIOS.length?`<div style="overflow-x:auto"><table class="usr-t"><thead><tr><th>Nombre</th><th>Usuario</th><th>Permisos</th><th>Ve</th><th></th></tr></thead><tbody>${USUARIOS.map(u=>`<tr class="${u.activo===false?"off":""}"><td><b>${esc(u.nombre)}</b>${YO&&YO.usuario===u.usuario?' <span class="code">(vos)</span>':""}<br><span class="rolchip">${esc(rolDe(u))}</span>${u.activo===false?' <span class="code">bloqueado</span>':""}</td><td>${esc(u.usuario)}</td>
+    <td><div class="permchips"><span class="pc on">Ver</span><span class="pc${u.editar?" on":""}">Cargar y editar</span><span class="pc${u.bloquear?" on":""}">Congelar</span><span class="pc${u.admin?" on":""}">Usuarios</span></div></td>
+    <td><div class="permchips">${U.filter(([k])=>!(u.unidades&&u.unidades.length)||u.unidades.includes(k)).map(([,n])=>`<span class="pc on">${n}</span>`).join("")}</div></td>
+    <td style="white-space:nowrap"><button type="button" class="lnk" data-usr-ed="${esc(u.usuario)}">Editar</button> <button type="button" class="lnk" data-usr-act="${esc(u.usuario)}">${u.activo===false?"Desbloquear":"Bloquear"}</button></td></tr>`).join("")}</tbody></table></div>`:"";
+  const e=usrEdit?USUARIOS.find(x=>x.usuario===usrEdit):null; const v=e||(USUARIOS.length?{editar:true,bloquear:false,admin:false,unidades:[]}:{editar:true,bloquear:true,admin:true,unidades:[]});
+  const unis=(v.unidades&&v.unidades.length)?v.unidades:U.map(x=>x[0]);
+  h+=`<div class="usr-form"><h3 class="full" style="margin:0;font-size:15px">${e?"Editar "+esc(e.nombre):(USUARIOS.length?"Nuevo usuario":"Crear administrador")}</h3>
+    <label>Nombre<input class="inp" id="uNom" value="${esc(e?e.nombre:"")}" placeholder="Carla"></label>
+    <label>Usuario<input class="inp" id="uUsr" value="${esc(e?e.usuario:"")}" ${e?"disabled":""} placeholder="carla"></label>
+    <label>${e?"Nueva clave (vacío = no cambia)":"Clave"}<input class="inp" id="uPin" type="password" autocomplete="new-password"></label>
+    <label>Perfil<select class="inp" id="uRol">${Object.entries(PRESETS).map(([k,p])=>`<option value="${k}" ${rolDe(v)===p.n?"selected":""}>${p.n}</option>`).join("")}<option value="custom" ${rolDe(v)==="Personalizado"?"selected":""}>Personalizado</option></select></label>
+    <div class="full"><span class="sub" style="display:block;margin-bottom:4px">Permisos</span><div class="chips">
+      <label class="chip"><input type="checkbox" checked disabled>Ver</label>
+      <label class="chip"><input type="checkbox" id="uEd" ${v.editar?"checked":""}>Cargar y editar (importar, ajustes, mover líneas)</label>
+      <label class="chip"><input type="checkbox" id="uBl" ${v.bloquear?"checked":""}>Congelar y descongelar meses</label>
+      <label class="chip"><input type="checkbox" id="uAd" ${v.admin?"checked":""}>Administrar usuarios</label></div></div>
+    <div class="full"><span class="sub" style="display:block;margin-bottom:4px">Qué puede ver</span><div class="chips">${U.map(([k,n])=>`<label class="chip"><input type="checkbox" class="uU" value="${k}" ${unis.includes(k)?"checked":""}>${n}</label>`).join("")}</div></div>
+    <div class="full" style="display:flex;justify-content:flex-end;gap:8px">${e?`<button type="button" class="btn ghost" id="uCancel">Cancelar</button>`:""}<button type="button" class="btn" id="uOk">${e?"Guardar cambios":"Crear usuario"}</button></div>
+    <p class="sub full" id="uErr" style="color:var(--neg);margin:0"></p></div>`;
+  el.innerHTML=h;
+  $("#uRol").onchange=()=>{ const p=PRESETS[$("#uRol").value]; if(p){ $("#uEd").checked=p.editar; $("#uBl").checked=p.bloquear; $("#uAd").checked=p.admin; } };
+  ["#uEd","#uBl","#uAd"].forEach(s=>$(s).onchange=()=>{ $("#uRol").value=rolDe({editar:$("#uEd").checked,bloquear:$("#uBl").checked,admin:$("#uAd").checked})==="Personalizado"?"custom":Object.keys(PRESETS).find(k=>PRESETS[k].n===rolDe({editar:$("#uEd").checked,bloquear:$("#uBl").checked,admin:$("#uAd").checked})); });
+  if($("#uCancel")) $("#uCancel").onclick=()=>{ usrEdit=null; pintarUsuarios(); };
+  $("#uOk").onclick=guardarUsuarioForm;
+}
+async function guardarUsuarioForm(){
+  const err=m=>$("#uErr").textContent=m;
+  const nom=$("#uNom").value.trim(), usr=norm($("#uUsr").value).replace(/\s/g,""), pin=$("#uPin").value;
+  const perm={editar:$("#uEd").checked,bloquear:$("#uBl").checked,admin:$("#uAd").checked,unidades:[...document.querySelectorAll(".uU:checked")].map(x=>x.value)};
+  if(!nom) return err("Falta el nombre."); if(!usr) return err("Falta el usuario.");
+  if(!perm.unidades.length) return err("Tiene que poder ver al menos una unidad.");
+  const ed=usrEdit?USUARIOS.find(x=>x.usuario===usrEdit):null;
+  if(!ed&&USUARIOS.some(x=>x.usuario===usr)) return err("Ese usuario ya existe.");
+  if(!ed&&pin.length<4) return err("La clave tiene que tener al menos 4 caracteres.");
+  if(ed&&pin&&pin.length<4) return err("La clave tiene que tener al menos 4 caracteres.");
+  const quedanAdmins=USUARIOS.filter(x=>x.admin&&x.activo!==false&&x.usuario!==(ed&&ed.usuario)).length+(perm.admin?1:0);
+  if(USUARIOS.length&&!quedanAdmins) return err("Tiene que quedar al menos un administrador activo.");
+  if(!USUARIOS.length&&!perm.admin) return err("El primer usuario tiene que ser administrador.");
+  let salt=ed?ed.salt:Math.random().toString(36).slice(2,10), hp=ed?ed.pin:null; if(pin){ salt=Math.random().toString(36).slice(2,10); hp=await hashPin(salt,pin); }
+  const nuevo={...(ed||{}),nombre:nom,usuario:ed?ed.usuario:usr,salt,pin:hp,...perm,activo:ed?ed.activo:true,actualizadoPor:usuario(),actualizadoEn:new Date().toISOString()};
+  const primero=!USUARIOS.length;
+  try{ await guardarUsuarios(l=>ed?l.map(x=>x.usuario===ed.usuario?nuevo:x):[...l,nuevo]); }catch(e){ return err("No se pudo guardar: "+e.message); }
+  if(primero){ YO=nuevo; try{ localStorage.setItem("eerr_sesion",JSON.stringify({usuario:nuevo.usuario,pin:nuevo.pin})); }catch(_){} aplicarPermisos(); render(); }
+  if(ed&&YO&&ed.usuario===YO.usuario&&pin){ try{ localStorage.setItem("eerr_sesion",JSON.stringify({usuario:nuevo.usuario,pin:nuevo.pin})); }catch(_){} }
+  usrEdit=null; pintarUsuarios(); st(primero?"Administrador creado. Desde ahora el panel pide usuario y clave.":"Usuario guardado.");
+}
+function abrirUsuarios(){ usrEdit=null; $("#dlgUsr").showModal(); pintarUsuarios(); leerUsuariosRemotos().then(r=>{ if(r){ USUARIOS=r; pintarUsuarios(); } }).catch(()=>{}); }
+$("#btnUsuarios").onclick=abrirUsuarios; $("#usrCerrar").onclick=()=>$("#dlgUsr").close();
+document.addEventListener("click",e=>{ if(e.target.closest("#sinUsr")) abrirUsuarios(); });
+$("#usrBody").addEventListener("click",async e=>{
+  const ed=e.target.closest("[data-usr-ed]"); if(ed){ usrEdit=ed.dataset.usrEd; pintarUsuarios(); return; }
+  const ac=e.target.closest("[data-usr-act]"); if(ac){ const u=USUARIOS.find(x=>x.usuario===ac.dataset.usrAct); const bloq=u.activo!==false;
+    if(bloq&&u.admin&&USUARIOS.filter(x=>x.admin&&x.activo!==false).length<=1){ alert("No se puede bloquear al único administrador activo."); return; }
+    if(!confirm(`${bloq?"¿Bloquear":"¿Desbloquear"} a ${u.nombre}?${bloq?" No va a poder entrar al panel.":""}`)) return;
+    try{ await guardarUsuarios(l=>l.map(x=>x.usuario===u.usuario?{...x,activo:!bloq}:x)); }catch(err){ alert(err.message); } }
+});
+
+/* ---------- Histórico SPL (carga única) ---------- */
+const SEED_SPL={"spl:2026-08":{"unidad":"spl","mes":"2026-08","estado":"congelado","valores":{"ventas":78262935.62,"cmv":0,"sueldos_prod":0,"sac_prod":0,"gv_prod":-253500,"gas_prod":0,"mant_prod":0,"sueldos_com":0,"sac_com":0,"movilidad":-218654.73,"publicidad":0,"comisiones":-1290843.86,"hon_com":0,"seg_com":0,"seg_flota":0,"flete":-1676152.89,"comex":0,"gcom":-201305.08,"sueldos_adm":0,"sac_adm":0,"gv_adm":0,"alquileres":0,"luz":0,"internet":-93155.26,"sistema":0,"hon_adm":-916850,"libreria":0,"seg_adm":-208836.5,"sellados":0,"gv_otros":-409213.71,"descuentos":0,"hon_prod":-155000,"mant_limp":0,"seg_prod":0,"obras_soc":0,"iibb":0,"imp_cheque":0,"com_banc":-1296544.8,"cargas":0,"asimra":0,"uom":0,"sec":0,"osecac":0,"faecys":0,"inacap":0,"ajuste_saldo":199413.84,"descubierto":0,"venta_valores":0,"prestamos":0,"afip_planes":0,"afip_sct":0,"arba":0,"uom_mor":0,"asimra_mor":0,"andina_mor":0,"sh_mor":0,"dif_cambio":0,"despidos":0,"acuerdos":0,"redondeo":-808379.57,"incobrables":0,"imp_gan":0,"ret_eduardo":0,"ret_facundo":0,"ret_juanma":0,"tc_corp":0},"manual":{},"congeladoPor":"Excel histórico","congeladoEn":"2026-10-09T12:00:00.000Z","historicoArchivo":"eerr_spl_unificado_protoipo.xlsx"},"spl:2026-07":{"unidad":"spl","mes":"2026-07","estado":"congelado","valores":{"ventas":38646162.88,"cmv":0,"sueldos_prod":0,"sac_prod":0,"gv_prod":-227250,"gas_prod":0,"mant_prod":-80018.56,"sueldos_com":0,"sac_com":0,"movilidad":-136364.81,"publicidad":0,"comisiones":-981028.63,"hon_com":0,"seg_com":0,"seg_flota":0,"flete":-1158812.4,"comex":0,"gcom":-435759.23,"sueldos_adm":0,"sac_adm":0,"gv_adm":-50000,"alquileres":0,"luz":0,"internet":0,"sistema":0,"hon_adm":-75420,"libreria":0,"seg_adm":0,"sellados":0,"gv_otros":-2112174.4,"descuentos":0,"hon_prod":0,"mant_limp":-66000,"seg_prod":0,"obras_soc":0,"iibb":0,"imp_cheque":0,"com_banc":0,"cargas":0,"asimra":0,"uom":0,"sec":0,"osecac":0,"faecys":0,"inacap":0,"ajuste_saldo":109495279.38,"descubierto":0,"venta_valores":0,"prestamos":0,"afip_planes":0,"afip_sct":0,"arba":0,"uom_mor":0,"asimra_mor":0,"andina_mor":0,"sh_mor":0,"dif_cambio":0,"despidos":0,"acuerdos":0,"redondeo":-188792.81,"incobrables":-1029901.04,"imp_gan":0,"ret_eduardo":0,"ret_facundo":0,"ret_juanma":0,"tc_corp":0},"manual":{},"congeladoPor":"Excel histórico","congeladoEn":"2026-10-09T12:00:00.000Z","historicoArchivo":"eerr_spl_unificado_protoipo.xlsx"},"spl:2026-06":{"unidad":"spl","mes":"2026-06","estado":"congelado","valores":{"ventas":53654090.85,"cmv":0,"sueldos_prod":0,"sac_prod":0,"gv_prod":-283275,"gas_prod":0,"mant_prod":-83380.58,"sueldos_com":0,"sac_com":0,"movilidad":-769686.85,"publicidad":0,"comisiones":0,"hon_com":0,"seg_com":0,"seg_flota":0,"flete":-1966557.03,"comex":0,"gcom":-84215.97,"sueldos_adm":0,"sac_adm":0,"gv_adm":-34000,"alquileres":0,"luz":0,"internet":0,"sistema":-30000,"hon_adm":0,"libreria":-32000,"seg_adm":-156460,"sellados":0,"gv_otros":-26377.96,"descuentos":0,"hon_prod":0,"mant_limp":0,"seg_prod":0,"obras_soc":0,"iibb":0,"imp_cheque":0,"com_banc":0,"cargas":0,"asimra":0,"uom":0,"sec":0,"osecac":0,"faecys":0,"inacap":0,"ajuste_saldo":-1088529.94,"descubierto":0,"venta_valores":0,"prestamos":0,"afip_planes":0,"afip_sct":0,"arba":0,"uom_mor":0,"asimra_mor":0,"andina_mor":0,"sh_mor":0,"dif_cambio":0,"despidos":0,"acuerdos":0,"redondeo":-843304.69,"incobrables":-10718.03,"imp_gan":0,"ret_eduardo":0,"ret_facundo":0,"ret_juanma":0,"tc_corp":0},"manual":{},"congeladoPor":"Excel histórico","congeladoEn":"2026-10-09T12:00:00.000Z","historicoArchivo":"eerr_spl_unificado_protoipo.xlsx"},"spl:2026-05":{"unidad":"spl","mes":"2026-05","estado":"congelado","valores":{"ventas":57172025.42,"cmv":0,"sueldos_prod":0,"sac_prod":0,"gv_prod":-151575,"gas_prod":-89889.01,"mant_prod":-1620000,"sueldos_com":0,"sac_com":0,"movilidad":-348708.37,"publicidad":-82740,"comisiones":0,"hon_com":0,"seg_com":0,"seg_flota":0,"flete":-1876500.09,"comex":0,"gcom":-217873.56,"sueldos_adm":0,"sac_adm":0,"gv_adm":-21750.88,"alquileres":0,"luz":0,"internet":0,"sistema":0,"hon_adm":-2467960,"libreria":-7209.4,"seg_adm":0,"sellados":0,"gv_otros":-34000,"descuentos":0,"hon_prod":-144300,"mant_limp":0,"seg_prod":0,"obras_soc":0,"iibb":0,"imp_cheque":0,"com_banc":0,"cargas":0,"asimra":0,"uom":0,"sec":0,"osecac":0,"faecys":0,"inacap":0,"ajuste_saldo":1854114.64,"descubierto":0,"venta_valores":0,"prestamos":0,"afip_planes":0,"afip_sct":0,"arba":0,"uom_mor":0,"asimra_mor":0,"andina_mor":0,"sh_mor":0,"dif_cambio":0,"despidos":0,"acuerdos":0,"redondeo":-103715.54,"incobrables":0,"imp_gan":0,"ret_eduardo":0,"ret_facundo":0,"ret_juanma":0,"tc_corp":0},"manual":{},"congeladoPor":"Excel histórico","congeladoEn":"2026-10-09T12:00:00.000Z","historicoArchivo":"eerr_spl_unificado_protoipo.xlsx"},"spl:2026-04":{"unidad":"spl","mes":"2026-04","estado":"congelado","valores":{"ventas":102345259.03,"cmv":0,"sueldos_prod":-6746969.52,"sac_prod":0,"gv_prod":-3431.59,"gas_prod":0,"mant_prod":0,"sueldos_com":-3368739.63,"sac_com":0,"movilidad":-51103.87,"publicidad":0,"comisiones":-1505010,"hon_com":0,"seg_com":0,"seg_flota":0,"flete":-926319,"comex":0,"gcom":-600018,"sueldos_adm":-5614782.5,"sac_adm":0,"gv_adm":0,"alquileres":0,"luz":0,"internet":0,"sistema":0,"hon_adm":-1134798,"libreria":0,"seg_adm":0,"sellados":0,"gv_otros":0,"descuentos":0,"hon_prod":-131790,"mant_limp":0,"seg_prod":0,"obras_soc":0,"iibb":0,"imp_cheque":0,"com_banc":0,"cargas":0,"asimra":0,"uom":0,"sec":0,"osecac":0,"faecys":0,"inacap":0,"ajuste_saldo":0,"descubierto":0,"venta_valores":0,"prestamos":4288743.83,"afip_planes":204647.76,"afip_sct":0,"arba":0,"uom_mor":0,"asimra_mor":0,"andina_mor":0,"sh_mor":0,"dif_cambio":0,"despidos":0,"acuerdos":0,"redondeo":0,"incobrables":0,"imp_gan":0,"ret_eduardo":-2580000,"ret_facundo":0,"ret_juanma":0,"tc_corp":0},"manual":{},"congeladoPor":"Excel histórico","congeladoEn":"2026-10-09T12:00:00.000Z","historicoArchivo":"eerr_spl_unificado_protoipo.xlsx"},"spl:2026-03":{"unidad":"spl","mes":"2026-03","estado":"congelado","valores":{"ventas":127350395.45,"cmv":0,"sueldos_prod":-6504357,"sac_prod":0,"gv_prod":0,"gas_prod":0,"mant_prod":-255800,"sueldos_com":-3247604,"sac_com":0,"movilidad":-167467.64,"publicidad":0,"comisiones":-780042,"hon_com":0,"seg_com":0,"seg_flota":0,"flete":-2027711.34,"comex":0,"gcom":0,"sueldos_adm":-5412882,"sac_adm":0,"gv_adm":0,"alquileres":0,"luz":0,"internet":0,"sistema":0,"hon_adm":-1025000,"libreria":0,"seg_adm":0,"sellados":0,"gv_otros":-420927.27,"descuentos":0,"hon_prod":-131790,"mant_limp":0,"seg_prod":0,"obras_soc":0,"iibb":0,"imp_cheque":-803562.37,"com_banc":0,"cargas":0,"asimra":0,"uom":0,"sec":0,"osecac":0,"faecys":0,"inacap":0,"ajuste_saldo":0,"descubierto":0,"venta_valores":0,"prestamos":4042126.02,"afip_planes":231438.48,"afip_sct":0,"arba":0,"uom_mor":0,"asimra_mor":0,"andina_mor":0,"sh_mor":0,"dif_cambio":0,"despidos":0,"acuerdos":0,"redondeo":0,"incobrables":0,"imp_gan":0,"ret_eduardo":-2580000,"ret_facundo":0,"ret_juanma":0,"tc_corp":0},"manual":{},"congeladoPor":"Excel histórico","congeladoEn":"2026-10-09T12:00:00.000Z","historicoArchivo":"eerr_spl_unificado_protoipo.xlsx"}};
+async function cargarHistoricoSpl(){
+  if(store!==remoto||CONFIG.histSplCargado) return;
+  const falt=Object.entries(SEED_SPL).filter(([id])=>!docs[id]); 
+  if(falt.length){ try{ await guardar(Object.fromEntries(falt),true); st(`Histórico de SPL cargado (${falt.length} meses, congelados).`); }catch(e){ console.warn(e); return; } }
+  try{ await guardarConfig({...CONFIG,histSplCargado:new Date().toISOString()}); }catch(_){}
+}
+
 /* ---------- Ayuda ---------- */
 function reglaDe(l){
   if(l.s==="odoo") return "Odoo, cuenta "+(l.c&&l.c.length?l.c.join(" + "):"(sin cuenta)")+"."+(l.nota?" "+l.nota:"");
@@ -1613,7 +1835,7 @@ function renderAyuda(){
   const filas=EST.filter(s=>s.l).map(s=>s.l.map(l=>`<tr><td>${esc(s.t)}</td><td>${esc(l.n)}</td><td>${esc(l.s==="odoo"?"Odoo":FUENTES[l.s].t)}</td><td>${esc(reglaDe(l))}</td></tr>`).join("")).join("");
   el.innerHTML=`
 <h2>Cómo funciona</h2>
-<nav class="toc" aria-label="Contenido"><a href="#a-mes">Cierre mensual</a><a href="#a-colores">Colores</a><a href="#a-fuentes">Fuentes de cada línea</a><a href="#a-fuentesx">Fuentes externas</a><a href="#a-socios">Socios</a><a href="#a-lupa">Lupa</a><a href="#a-alertas">Alertas</a><a href="#a-mover">Mover líneas</a><a href="#a-pedidos">Pedidos</a><a href="#a-cong">Congelar</a><a href="#a-unid">Unidades</a><a href="#a-exp">Exportar</a><a href="#a-faq">Preguntas frecuentes</a></nav>
+<nav class="toc" aria-label="Contenido"><a href="#a-mes">Cierre mensual</a><a href="#a-colores">Colores</a><a href="#a-fuentes">Fuentes de cada línea</a><a href="#a-fuentesx">Fuentes externas</a><a href="#a-socios">Socios</a><a href="#a-lupa">Lupa</a><a href="#a-alertas">Alertas</a><a href="#a-usuarios">Usuarios</a><a href="#a-mover">Mover líneas</a><a href="#a-pedidos">Pedidos</a><a href="#a-cong">Congelar</a><a href="#a-unid">Unidades</a><a href="#a-exp">Exportar</a><a href="#a-faq">Preguntas frecuentes</a></nav>
 <p>El estado de resultados se arma combinando dos cosas: el <strong>export de Odoo</strong>, que trae todo lo contable, y las <strong>fuentes externas</strong> (líneas celestes), que reemplazan lo que en Odoo no está bien imputado o directamente no está: sueldos, CMV, bancos, intereses, etc. Todo se guarda en Supabase, así que lo que carga una persona lo ve todo el equipo.</p>
 
 <h2 id="a-mes">Cierre de un mes, paso a paso</h2>
@@ -1621,7 +1843,7 @@ function renderAyuda(){
 <li><strong>Importar el export de Odoo.</strong> Botón <em>Importar export de Odoo</em>. Elegís la unidad (si el archivo dice "SPL" en el nombre la sugiere sola) y qué meses tomar. Los meses congelados no se pueden pisar.</li>
 <li><strong>Panel de cheques.</strong> Se sincroniza solo al abrir y al tocar <em>Actualizar</em>: completa las líneas de bancos de los meses abiertos (de las dos unidades) dentro del período que cubre el panel. No pisa lo que se haya cargado a mano. El botón <em>Traer del panel de cheques</em> sigue disponible para ver la comparación mes por mes.</li>
 <li><strong>Cargar histórico</strong> (una sola vez por unidad): sube el Excel retrabajado con los meses ya cerrados y los deja congelados. Controla mes por mes que el resultado final calculado coincida con el del Excel y avisa si alguna fila con importe no se pudo ubicar.</li>
-<li><strong>Importar VEP y boletas.</strong> Botón <em>Importar VEP y boletas</em>: seleccionás todos los PDF del mes juntos (VEP 931 y boletas de sindicato). Detecta solo el tipo, la empresa (por CUIT) y el período. El VEP va a Cargas Sociales (total a pagar, con el detalle por código en la lupa). En SPL: SEC, OSECAC, FAECYS e INACAP; en Spotsline: UOM y Asimra. De las boletas con dos vencimientos se toma el primero. Los PDF escaneados (imagen) no se pueden leer: para esos, el VEP.</li>
+<li><strong>Importar VEP y boletas.</strong> Botón <em>Importar VEP y boletas</em>: seleccionás todos los PDF del mes juntos (VEP 931 y boletas de sindicato). Detecta solo el tipo, la empresa (por CUIT) y el período. El VEP va a Cargas Sociales (total a pagar, con el detalle por código en la lupa). En SPL: SEC, OSECAC, FAECYS e INACAP; en Spotsline: UOM cuota sindical, UOM seguro de vida (Art. 52), Asimra y Asimra seguro de vida (Art. 18). Las boletas de UOM vienen como imagen: el sistema reconoce tipo, empresa y período por el nombre del archivo (por ejemplo "Spotsline - UOM Seg Vida 202609.pdf"), te muestra el comprobante y vos escribís el total. De las boletas con dos vencimientos se toma el primero. Los PDF escaneados (imagen) no se pueden leer: para esos, el VEP.</li>
 <li><strong>Importar el CMV.</strong> Botón <em>Importar CMV</em> con el export de Odoo «Estadísticas de facturas» agrupado por mes. Suma la columna Valor del inventario (incluye notas de crédito y comprobantes internos 0001/…). En la lupa se ve el CMV por tipo de comprobante y por producto.</li>
 <li><strong>Importar el Cash Flow.</strong> Botón <em>Importar Cash Flow</em> y elegís el Excel <em>Cash Flow SPL - Spotsline</em>. Calcula los intereses de las dos unidades a la vez; marcás los meses y aplicás.</li>
 <li><strong>Completar lo manual.</strong> Lo que queda rayado en amarillo está pendiente. Tocás la celda, y en el panel de la derecha escribís el importe (los gastos en negativo) y guardás.</li>
@@ -1641,6 +1863,7 @@ function renderAyuda(){
 <li>Siempre se toma <strong>lo que vence en el período</strong>, según la columna de fecha de vencimiento de cada solapa (no la fecha de pago).</li>
 <li>Se toman solo las filas de <strong>Spotsline</strong> y <strong>SPL</strong>. Las filas de otras empresas (por ejemplo, Facundo) se ignoran y el importador avisa cuántas fueron.</li>
 <li>Las cuotas con <strong>Estado "Caduco"</strong> no se toman.</li>
+<li>De la solapa <strong>Sueldos y CCSS</strong> (por Mes Devengado) se toman como <strong>estimado</strong> las cargas sociales (SS + OS, ART y SVC + ART) y los sindicatos (UOM, Asimra, SEC, OSECAC, FAECYS, INACAP). Se ven en amarillo con ≈ y se reemplazan al subir el VEP o la boleta. Los sueldos se toman de ahí solo si la referencia indica el área (por ejemplo "Sueldos Producción"); si no, siguen saliendo de la liquidación.</li>
 <li>Despidos salen de la solapa Desvinculaciones y los Acuerdos de Planes de Pago (Tipo SUELDOS), en los dos casos por la columna Cuota.</li>
 <li>Las celdas con "-" o vacías cuentan como cero.</li>
 <li>Al importar, un mes abierto se pisa con lo que trae el archivo en esas líneas; si una línea no tiene vencimientos ese mes, queda en cero.</li>
@@ -1680,6 +1903,14 @@ ${Object.entries(FUENTES).map(([k,f])=>`<h3>${esc(f.t)}</h3><p class="muted">${e
 <li><strong>Responder</strong>, en cada pedido, agrega una respuesta o acción tomada y cambia el estado. Queda el historial con quién respondió y cuándo.</li>
 <li><strong>Pegar respuesta de Claude</strong>: Claude responde con una línea por pedido (<span class="code">#3 | Resuelto | qué se hizo</span>); la pegás y se aplica a cada pedido, con vista previa antes de confirmar.</li>
 </ul><p class="muted">Arriba de la lista se filtra entre abiertos, cerrados o todos.</p>
+<h2 id="a-usuarios">Usuarios y permisos</h2>
+<p>Con el botón <em>Usuarios</em> (solo administradores) se crean usuarios con nombre, usuario y clave, y se elige qué puede hacer cada uno:</p>
+<ul><li><strong>Ver</strong>: todos. Además se elige qué unidades ve (Spotsline, SPL y/o Consolidado).</li>
+<li><strong>Cargar y editar</strong>: importar archivos, cargar valores, ajustes, marcar alertas como revisadas, mover líneas.</li>
+<li><strong>Congelar y descongelar</strong> meses (el bloqueo de períodos).</li>
+<li><strong>Administrar usuarios</strong>.</li></ul>
+<p>Hay perfiles armados (Solo lectura, Carga, Supervisor, Administrador) y se pueden combinar a mano. Un usuario se puede <strong>bloquear</strong> para que no entre más sin borrarlo. Mientras no exista ningún usuario, el panel funciona como antes, con acceso total. Lo que se congela, carga o revisa queda firmado con el nombre del usuario.</p>
+<p class="muted">Importante: los permisos ordenan el uso del panel, pero la base de Supabase sigue abierta para quien tenga el archivo con la clave del proyecto. Para seguridad real hace falta activar Supabase Auth con reglas por usuario.</p>
 <h2 id="a-mover">Mover líneas entre bloques</h2>
 <p>Arrastrá una línea desde el ⠿ que aparece a la izquierda de su nombre y soltala sobre otra línea (queda arriba de esa) o sobre el título de un bloque (queda al final). También se puede hacer desde la lupa, en <em>Ubicación</em>. El cambio se guarda en Supabase y lo ve todo el equipo. Ventas, CMV e Impuesto a las ganancias no se mueven.</p>
 <p>Si la línea tiene valores en meses congelados, avisa antes: los valores no cambian, pero sí los totales de los bloques y, si la línea cruza el EBITDA, los subtotales de esos meses.</p>
@@ -1818,7 +2049,7 @@ $("#imp").addEventListener("change",e=>{const f=e.target.files[0]; if(f)abrirImp
 $("#btnExport").onclick=abrirExport;
 let arrastrando=null;
 const tb=$("#tbl tbody");
-tb.addEventListener("dragstart",e=>{ const tr=e.target.closest("tr.linea"); if(!tr) return; if(BLOQUE_FIJO.has(tr.dataset.bl)){e.preventDefault();return;}
+tb.addEventListener("dragstart",e=>{ const tr=e.target.closest("tr.linea"); if(!tr) return; if(!PERM.editar){e.preventDefault();return;} if(BLOQUE_FIJO.has(tr.dataset.bl)){e.preventDefault();return;}
   arrastrando=tr.dataset.linea; tr.classList.add("arrastrando"); e.dataTransfer.effectAllowed="move"; try{e.dataTransfer.setData("text/plain",arrastrando);}catch(_){} });
 tb.addEventListener("dragend",()=>{ arrastrando=null; document.querySelectorAll(".arrastrando,.drop-antes,.drop-dentro").forEach(x=>x.classList.remove("arrastrando","drop-antes","drop-dentro")); });
 function destinoDrop(e){ const tr=e.target.closest("tr"); if(!tr||!arrastrando) return null;
